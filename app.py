@@ -7,8 +7,9 @@ from backend_test.todo import Todo
 app = Flask(__name__)
 api = Api(app)
 
-api.add_resource(Todo, "/todo/<int:id>")
 
+api.add_resource(Todo, "/todo/<int:id>")
+api.add_resource(Todo, "/todos", endpoint='todos')
 
 aux = {
     "1": {"data": "Data one"},

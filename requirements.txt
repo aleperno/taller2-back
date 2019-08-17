@@ -1,2 +1,4 @@
 flask-restful
 gunicorn
+sqlalchemy
+psycopg2-binary
