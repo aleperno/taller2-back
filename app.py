@@ -10,19 +10,8 @@ api = Api(app)
 
 api.add_resource(Todo, "/todo/<int:id>")
 api.add_resource(Todo, "/todos", endpoint='todos')
+api.add_resource(User, "/user/<int:id>")
 api.add_resource(User, "/users", endpoint='users')
-
-aux = {
-    "1": {"data": "Data one"},
-    "2": {"data": "Data two"},
-}
-
-@app.route('/users/<user_id>', methods=['POST', 'GET', 'DELETE'])
-def user(user_id):
-    if request.method == 'GET':
-        return aux[user_id], 200
-    if request.method == 'POST':
-        return request.data, 200
 
 
 if __name__ == "__main__":

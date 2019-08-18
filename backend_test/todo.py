@@ -48,3 +48,9 @@ class User(Resource):
         if id is None:
             r = s.query(TallerUser).all()
             return [e.as_dict() for e in r], 200
+        else:
+            r = s.query(TallerUser).get(id)
+            if r is not None:
+                return r.as_dict(), 200
+            else:
+                return f"Item with id {id} was not found", 404
