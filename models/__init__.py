@@ -42,6 +42,3 @@ class GlovoUser(Base):
 
     def __repr__(self):
         return f'Taller 2 User. id: {self.id}, name: {self.name}'
-
-
-Base.metadata.create_all(engine)
