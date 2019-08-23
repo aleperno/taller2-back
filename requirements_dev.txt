@@ -3,4 +3,4 @@ pytest
 pytest-cov
 pytest-mock
 ipython
-python-coveralls
+coveralls[yaml]
