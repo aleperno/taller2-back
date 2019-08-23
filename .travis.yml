@@ -1,4 +1,6 @@
 language: python
+notifications:
+    email: false
 install:
     - pip install -r requirements_dev.txt
 services:
