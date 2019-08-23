@@ -8,11 +8,11 @@ app = Flask(__name__)
 api = Api(app)
 
 
-api.add_resource(Todo, "/todo/<int:id>")
-api.add_resource(Todo, "/todos", endpoint='todos')
-api.add_resource(User, "/user/<int:id>")
-api.add_resource(User, "/users", endpoint='users')
+api.add_resource(Todo, "/api/todo/<int:id>")
+api.add_resource(Todo, "/api/todos", endpoint='todos')
+api.add_resource(User, "/api/user/<int:id>")
+api.add_resource(User, "/api/users", endpoint='users')
 
 
 if __name__ == "__main__":
-      app.run()
+    app.run()

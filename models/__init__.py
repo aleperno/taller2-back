@@ -28,19 +28,20 @@ class JSONEncodedValue(TypeDecorator):
         return value
 
 
-class TallerUser(Base):
-    __tablename__ = 't2table'
+class GlovoUser(Base):
+    __tablename__ = 'glovo_user'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    age = Column(Integer)
-
+    email = Column(String, unique=True)
+    password = Column(String)
 
     def as_dict(self):
-        return {'id': self.id, 'name': self.name, 'age': self.age}
+        return {'id': self.id, 'name': self.name, 'email': self.email,
+                'passwd': self.password}
 
     def __repr__(self):
-        return f'Taller 2 User. id: {self.id}, name: {self.name}, age: {self.age}'
+        return f'Taller 2 User. id: {self.id}, name: {self.name}'
+
 
 Base.metadata.create_all(engine)
-
