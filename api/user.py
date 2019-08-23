@@ -1,12 +1,16 @@
 from flask_restful import Resource
 from flask import request
 from models import GlovoUser, Session
+from api.schemas.user import NewUserSchema
 
 s = Session()
 
 class NewUser(Resource):
 
     def post(self):
+        errors = NewUserSchema().validate(request.json)
+        if errors:
+            return errors, 400
         name = request.json['name']
         email = request.json['email']
         password = request.json['password']

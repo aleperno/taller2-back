@@ -2,3 +2,5 @@ flask-restful
 gunicorn
 sqlalchemy
 psycopg2-binary
+marshmallow
+flask-apispec
