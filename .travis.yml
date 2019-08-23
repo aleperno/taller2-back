@@ -1,6 +1,11 @@
 language: python
 install:
     - pip install -r requirements_dev.txt
+services:
+    - postgresql
+before_script:
+    - psql -c "create user t2user with password 't2pass';" -U postgres
+    - psql -c "create database t2db_test with owner t2user;"
 script:
     - make test
 after_success:
