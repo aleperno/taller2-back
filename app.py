@@ -2,7 +2,7 @@ from flask import Flask
 from flask import request
 from flask_restful import Api
 
-from backend_test.todo import Todo, User
+from api.todo import Todo, User
 
 app = Flask(__name__)
 api = Api(app)

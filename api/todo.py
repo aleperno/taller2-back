@@ -4,7 +4,7 @@ from flask_restful import Api
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, JSON
 from sqlalchemy.orm import sessionmaker
 
-from .models import Session, TallerUser
+from models import Session, TallerUser
 
 s = Session()
 

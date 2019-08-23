@@ -1,4 +1,4 @@
-from backend_test.models import Session, TallerUser
+from models import Session, TallerUser
 
 s = Session()
 
