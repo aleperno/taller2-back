@@ -6,3 +6,13 @@
 Este repositorio será el código del Backend / Admin GUI para el TP de Taller de
 Programación 2
 
+## API
+
+[http://taller2-back.herokuapp.com/api](http://taller2-back.herokuapp.com/api)
+
+Todos los endpoints poseen el prefijo `/api/`
+
+### Usuarios
+
+ * `/api/users`: Lista los usuarios en la base de datos
+ * `/api/user/<id>`: Devuelve la información del usuario con id
