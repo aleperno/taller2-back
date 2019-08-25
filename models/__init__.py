@@ -33,12 +33,18 @@ class GlovoUser(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    surname = Column(String)
     email = Column(String, unique=True)
     password = Column(String)
 
     def as_dict(self):
-        return {'id': self.id, 'name': self.name, 'email': self.email,
-                'passwd': self.password}
+        return {
+            'id': self.id,
+            'name': self.name,
+            'surname': self.surname,
+            'email': self.email,
+            'passwd': self.password
+        }
 
     def __repr__(self):
-        return f'Taller 2 User. id: {self.id}, name: {self.name}'
+        return f'Foodie User: id: {self.id}, name: {self.name}'

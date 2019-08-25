@@ -19,6 +19,7 @@ def db_session(mocker):
     mocker.patch('models.Session', new_callable=mocked_session)
     yield Session
     Session.close_all()
+    #Session().close_all_sessions()
     Base.metadata.drop_all(bind=engine)
 
 
@@ -29,14 +30,14 @@ def testing_app():
 
 @pytest.fixture
 def one_user(db_session):
-    user = GlovoUser(id=1, name='Single User', email='suser@gmail.com', password='12345')
+    user = GlovoUser(id=1, name='Single', surname='User', email='suser@gmail.com', password='12345')
     db_session.add(user)
     db_session.commit()
 
 
 @pytest.fixture
 def multiple_users(db_session):
-    user1 = GlovoUser(id=1, name='John Doe', email='jdoe@gmail.com', password='12345')
-    user2 = GlovoUser(id=2, name='Jane Doe', email='janedoe@gmail.com', password='54321')
+    user1 = GlovoUser(id=1, name='John', surname='Doe', email='jdoe@gmail.com', password='12345')
+    user2 = GlovoUser(id=2, name='Jane', surname='Doe', email='janedoe@gmail.com', password='54321')
     db_session.add_all([user1, user2])
     db_session.commit()

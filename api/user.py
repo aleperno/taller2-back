@@ -12,6 +12,7 @@ class NewUser(Resource):
         if errors:
             return errors, 400
         name = request.json['name']
+        surname = request.json['surname']
         email = request.json['email']
         password = request.json['password']
 
@@ -20,7 +21,7 @@ class NewUser(Resource):
         if exists:
             return "Email already registered", 400
         else:
-            new_user = GlovoUser(name=name, email=email, password=password)
+            new_user = GlovoUser(name=name, surname=surname, email=email, password=password)
             models.Session.add(new_user)
             models.Session.commit()
             user = self.get_user_by_email(email)

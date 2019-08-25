@@ -6,13 +6,15 @@ def test_multiple_user(multiple_users, testing_app):
     assert r.json == [
         {
             'id': 1,
-            'name': 'John Doe',
+            'name': 'John',
+            'surname': 'Doe',
             'email': 'jdoe@gmail.com',
             'passwd': '12345'
         },
         {
             'id': 2,
-            'name': 'Jane Doe',
+            'name': 'Jane',
+            'surname': 'Doe',
             'email': 'janedoe@gmail.com',
             'passwd': '54321'
         }
@@ -24,7 +26,8 @@ def test_single_user(multiple_users, testing_app):
     assert r.status_code == 200
     assert r.json == {
         'id': 1,
-        'name': 'John Doe',
+        'name': 'John',
+        'surname': 'Doe',
         'email': 'jdoe@gmail.com',
         'passwd': '12345'
     }
@@ -49,13 +52,14 @@ def test_new_user(db_session, testing_app):
     # Setup
     r = testing_app.post(
         '/api/new_user',
-        data=json.dumps({'name': 'Juancito', 'email': 'juancito@gmail.com', 'password': 'insecure'}),
+        data=json.dumps({'name': 'Juancito', 'surname': 'Lopez', 'email': 'juancito@gmail.com', 'password': 'insecure'}),
         content_type='application/json'
     )
     assert r.status_code == 200
     assert r.json == {
         'id': 1,
         'name': 'Juancito',
+        'surname': 'Lopez',
         'email': 'juancito@gmail.com',
         'passwd': 'insecure'
     }
@@ -64,7 +68,7 @@ def test_new_user(db_session, testing_app):
 def test_user_existing_email(one_user, testing_app):
     r = testing_app.post(
         '/api/new_user',
-        data=json.dumps({'name': 'Single User', 'email': 'suser@gmail.com', 'password': 'insecure'}),
+        data=json.dumps({'name': 'Single', 'surname': 'User', 'email': 'suser@gmail.com', 'password': 'insecure'}),
         content_type='application/json'
     )
 
