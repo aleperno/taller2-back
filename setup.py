@@ -6,5 +6,5 @@ setup(name='backend-test',
       description='Test de backend',
       author='Alejandro Pernin',
       author_email='apernin@fi.uba.ar',
-      packages=find_packages(exclude=('tests', 'tests.*')),
+      packages=find_packages(exclude=('tests', 'documentation', 'tests.*')),
       )
