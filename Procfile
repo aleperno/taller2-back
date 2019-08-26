@@ -1,2 +1,2 @@
-release: alembic upgrade head
+release: make migrate
 web: gunicorn app:app
