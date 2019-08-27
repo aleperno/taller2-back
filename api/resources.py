@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_restful import Api
-from api.todo import User
-from api.user import NewUser
+from api.user import NewUser, User
 
 app = Flask(__name__)
 api = Api(app)

@@ -9,14 +9,20 @@ def test_multiple_user(multiple_users, testing_app):
             'name': 'John',
             'surname': 'Doe',
             'email': 'jdoe@gmail.com',
-            'passwd': '12345'
+            'password': 'insecure',
+            'phone': '4444-5555',
+            'subscription': 'flat',
+            'role': 'user'
         },
         {
             'id': 2,
             'name': 'Jane',
             'surname': 'Doe',
             'email': 'janedoe@gmail.com',
-            'passwd': '54321'
+            'password': 'insecure',
+            'phone': '4444-5555',
+            'subscription': 'flat',
+            'role': 'user'
         }
     ]
 
@@ -29,7 +35,10 @@ def test_single_user(multiple_users, testing_app):
         'name': 'John',
         'surname': 'Doe',
         'email': 'jdoe@gmail.com',
-        'passwd': '12345'
+        'password': 'insecure',
+        'phone': '4444-5555',
+        'subscription': 'flat',
+        'role': 'user'
     }
 
 
@@ -50,9 +59,17 @@ def test_new_user(db_session, testing_app):
     assert testing_app.get('/api/users').json == []
 
     # Setup
+    json_body = {
+        'name': 'Juancito',
+        'surname': 'Lopez',
+        'email': 'juancito@gmail.com',
+        'password': 'insecure',
+        'phone': '4781-6140'
+    }
+
     r = testing_app.post(
         '/api/new_user',
-        data=json.dumps({'name': 'Juancito', 'surname': 'Lopez', 'email': 'juancito@gmail.com', 'password': 'insecure'}),
+        data=json.dumps(json_body),
         content_type='application/json'
     )
     assert r.status_code == 200
@@ -61,14 +78,25 @@ def test_new_user(db_session, testing_app):
         'name': 'Juancito',
         'surname': 'Lopez',
         'email': 'juancito@gmail.com',
-        'passwd': 'insecure'
+        'password': 'insecure',
+        'phone': '4781-6140',
+        'subscription': 'flat',
+        'role': 'user'
+
     }
 
 
 def test_user_existing_email(one_user, testing_app):
+    json_body = {
+        'name': 'Single',
+        'surname': 'User',
+        'email': 'suser@gmail.com',
+        'password': 'insecure',
+        'phone': '4444-5555'
+    }
     r = testing_app.post(
         '/api/new_user',
-        data=json.dumps({'name': 'Single', 'surname': 'User', 'email': 'suser@gmail.com', 'password': 'insecure'}),
+        data=json.dumps(json_body),
         content_type='application/json'
     )
 

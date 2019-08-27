@@ -1,11 +1,19 @@
 import pytest
-from models import GlovoUser
+from models.users import FoodieUser
 
 
 def test_one_user(one_user, db_session):
-    user = db_session.query(GlovoUser).get(1)
-    assert user.as_dict() == {'id': 1, 'name': 'Single', 'surname': 'User', 'email': 'suser@gmail.com', 'passwd': '12345'}
+    user = db_session.query(FoodieUser).get(1)
+    assert user.as_dict() == {'id': 1,
+                              'name': 'Single',
+                              'surname': 'User',
+                              'email': 'suser@gmail.com',
+                              'phone': '4444-5555',
+                              'password': 'insecure',
+                              'subscription': 'flat',
+                              'role': 'user',
+                              }
 
 
 def test_no_user(db_session):
-    assert not db_session.query(GlovoUser).all()
+    assert not db_session.query(FoodieUser).all()

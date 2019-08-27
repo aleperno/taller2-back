@@ -1,11 +1,11 @@
-from models import Session, GlovoUser
+from models import Session, FoodieUser
 
 s = Session()
 
 
 def create_users():
-    s.add(GlovoUser(name='John Doe', age=44))
-    s.add(GlovoUser(name='San Martin', age=999))
+    s.add(FoodieUser(name='John Doe', age=44))
+    s.add(FoodieUser(name='San Martin', age=999))
     s.commit()
 
 
