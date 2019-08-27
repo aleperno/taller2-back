@@ -101,5 +101,5 @@ def test_user_existing_email(one_user, testing_app):
     )
 
     assert r.status_code == 400
-    assert r.json == 'Email already registered'
+    assert r.json == {'email': ['Email already exists']}
 
