@@ -129,7 +129,7 @@ def test_login_existing_user(mocker, one_user, testing_app):
     assert r.json == {'token': f'{one_user.id}.abcdedcba'}
 
 
-def test_login_nonexistent_user(testing_app):
+def test_login_nonexistent_user(db_session, testing_app):
     json_body = {
         'email': 'nobody@gmail.com',
         'password': 'asdqwer'
