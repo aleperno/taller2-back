@@ -7,7 +7,7 @@ from models import Base
 from utils import random_string
 
 
-class JSONEncodedValue(TypeDecorator):
+class JSONEncodedValue(TypeDecorator):  # pragma: no cover
     impl = VARCHAR
 
     def process_bind_param(self, value, dialect):
@@ -59,7 +59,7 @@ class FoodieUser(Base):
     def get_by_email(cls, email):
         return models.Session.query(FoodieUser).filter(FoodieUser.email == email).scalar()
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return f'Foodie User: id: {self.id}, name: {self.name}'
 
 
@@ -83,10 +83,27 @@ class AuthToken(Base):
     def new_token():
         return random_string(length=15)
 
-    def get_token(self):
+    @staticmethod
+    def generate_new_token(user_id):
+        """
+        Generate a new token for a given user (first time)
+        """
+        new = AuthToken(user_id)
+        models.Session.add(new)
+        models.Session.commit()
+        return new
+
+    def public_token(self):
         return f"{self.user_id}.{self.token}"
 
     @classmethod
     def get_user_token(cls, user_id):
-        return models.Session.query(AuthToken).get(user_id)
+        current = models.Session.query(AuthToken).get(user_id)
+        if not current:
+            return cls.generate_new_token(user_id)
+        else:
+            return current
+
+    def _as_dict(self):
+        return {'token': self.public_token()}
 

@@ -2,6 +2,7 @@ from marshmallow import (
     fields,
     Schema,
     )
+from api.validators import email_exists
 
 
 class LoginSchema(Schema):

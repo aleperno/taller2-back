@@ -53,6 +53,7 @@ def one_user(db_session):
     user = FoodieUser(id=1, **user_data)
     db_session.add(user)
     db_session.commit()
+    return user
 
 
 @pytest.fixture

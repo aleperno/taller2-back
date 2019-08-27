@@ -1,4 +1,6 @@
 import json
+import pytest
+
 
 def test_multiple_user(multiple_users, testing_app):
     r = testing_app.get('/api/users')
@@ -72,7 +74,7 @@ def test_new_user(db_session, testing_app):
         data=json.dumps(json_body),
         content_type='application/json'
     )
-    assert r.status_code == 200
+    assert r.status_code == 201
     assert r.json == {
         'id': 1,
         'name': 'Juancito',
@@ -103,3 +105,66 @@ def test_user_existing_email(one_user, testing_app):
     assert r.status_code == 400
     assert r.json == {'email': ['Email already exists']}
 
+
+def test_login_existing_user(mocker, one_user, testing_app):
+    mocker.patch('models.users.random_string', return_value='abcdedcba')
+    json_body = {
+        'email': 'suser@gmail.com',
+        'password': 'insecure'
+    }
+    r = testing_app.post(
+        '/api/login',
+        data=json.dumps(json_body),
+    )
+    assert r.status_code == 200
+    assert r.json == {'token': f'{one_user.id}.abcdedcba'}
+
+    # Secuential calls should return the same
+
+    r = testing_app.post(
+        '/api/login',
+        data=json.dumps(json_body),
+    )
+    assert r.status_code == 200
+    assert r.json == {'token': f'{one_user.id}.abcdedcba'}
+
+
+def test_login_nonexistent_user(testing_app):
+    json_body = {
+        'email': 'nobody@gmail.com',
+        'password': 'asdqwer'
+    }
+    r = testing_app.post(
+        '/api/login',
+        data=json.dumps(json_body),
+    )
+    assert r.status_code == 404
+    assert r.json == 'User not found'
+
+
+def test_login_wrong_password(one_user, testing_app):
+    json_body = {
+        'email': 'suser@gmail.com',
+        'password': 'thisisnotthepassword'
+    }
+    r = testing_app.post(
+        '/api/login',
+        data=json.dumps(json_body),
+    )
+    assert r.status_code == 401
+    assert r.json == 'Wrong Password'
+
+
+@pytest.mark.parametrize('missing', ('email', 'password'))
+def test_login_missing_field(missing, testing_app):
+    json_body = {
+        'email': 'suser@gmail.com',
+        'password': 'thisisnotthepassword'
+    }
+    json_body.pop(missing)
+    r = testing_app.post(
+        '/api/login',
+        data=json.dumps(json_body),
+    )
+    assert r.status_code == 400
+    assert r.json == {missing: ['Missing data for required field.']}

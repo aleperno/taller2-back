@@ -11,7 +11,7 @@ class NewUser(Resource):
 
     def post(self):
         try:
-            user_data = NewUserSchema().load(request.json)
+            user_data = NewUserSchema().load(request.get_json(force=True))
         except ValidationError as e:
             return e.messages, 400
 
@@ -22,7 +22,7 @@ class NewUser(Resource):
         models.Session.commit()
         user = FoodieUser.get_by_email(email)
 
-        return user.as_dict(), 200
+        return user.as_dict(), 201
 
 
 
@@ -37,16 +37,3 @@ class User(Resource):
                 return r.as_dict(), 200
             else:
                 return f"User with id {id} was not found", 404
-
-
-class Login(Resource):
-    def post(self):
-        try:
-            user_data = LoginSchema().load(request.json)
-        except ValidationError as e:
-            return e.messages, 400
-
-        email = user_data['email']
-        password = user_data['password']
-
-
