@@ -1,0 +1,26 @@
+from flask_restful import Resource
+from flask import request
+from models.users import FoodieUser, AuthToken
+from api.schemas.auth import LoginSchema
+from marshmallow import ValidationError
+import models
+
+
+class Login(Resource):
+    def post(self):
+        try:
+            user_data = LoginSchema().load(request.get_json(force=True))
+        except ValidationError as e:
+            return e.messages, 400
+
+        email = user_data['email']
+        password = user_data['password']
+
+        user = FoodieUser.get_by_email(email)
+
+        if not user:
+            return 'User not found', 404
+        elif not user.valid_password(password):
+            return 'Wrong Password', 401
+        else:
+            return AuthToken.get_user_token(user.id)._as_dict(), 200

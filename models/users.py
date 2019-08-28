@@ -1,11 +1,13 @@
 import json
-
-from sqlalchemy import Column, Integer, String, Boolean, JSON
+import models
+from datetime import datetime, timedelta
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from models import Base
+from utils import random_string
 
 
-class JSONEncodedValue(TypeDecorator):
+class JSONEncodedValue(TypeDecorator):  # pragma: no cover
     impl = VARCHAR
 
     def process_bind_param(self, value, dialect):
@@ -50,5 +52,58 @@ class FoodieUser(Base):
     def is_user(self):
         return self.role == 'user'
 
-    def __repr__(self):
+    def valid_password(self, password):
+        return self.password == password
+
+    @classmethod
+    def get_by_email(cls, email):
+        return models.Session.query(FoodieUser).filter(FoodieUser.email == email).scalar()
+
+    def __repr__(self):  # pragma: no cover
         return f'Foodie User: id: {self.id}, name: {self.name}'
+
+
+class AuthToken(Base):
+    __tablename__ = 'auth_token'
+
+    user_id = Column(Integer, ForeignKey('foodie_user.id'), primary_key=True)
+    token = Column(String, nullable=False)
+    expiration = Column(DateTime, nullable=False)
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.token = self.new_token()
+        self.expiration = datetime.utcnow() + timedelta(days=1)
+
+    def expired(self):
+        False
+        #return datetime.utcnow() > self.expiration
+
+    @staticmethod
+    def new_token():
+        return random_string(length=15)
+
+    @staticmethod
+    def generate_new_token(user_id):
+        """
+        Generate a new token for a given user (first time)
+        """
+        new = AuthToken(user_id)
+        models.Session.add(new)
+        models.Session.commit()
+        return new
+
+    def public_token(self):
+        return f"{self.user_id}.{self.token}"
+
+    @classmethod
+    def get_user_token(cls, user_id):
+        current = models.Session.query(AuthToken).get(user_id)
+        if not current:
+            return cls.generate_new_token(user_id)
+        else:
+            return current
+
+    def _as_dict(self):
+        return {'token': self.public_token()}
+
