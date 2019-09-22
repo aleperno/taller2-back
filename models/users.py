@@ -33,6 +33,7 @@ class FoodieUser(Base):
     role = Column(String)
     subscription = Column(String)
     password = Column(String)
+    creation_date = Column(DateTime, default=datetime.utcnow)
 
     def as_dict(self):
         return {
@@ -44,6 +45,7 @@ class FoodieUser(Base):
             'password': self.password,
             'role': self.role,
             'subscription': self.subscription,
+            #'creation_date': self.creation_date,
         }
 
     def is_premium(self):
