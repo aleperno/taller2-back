@@ -109,3 +109,55 @@ class AuthToken(Base):
     def _as_dict(self):
         return {'token': self.public_token()}
 
+
+class PasswordRecoveryToken(Base):
+    __tablename__ = 'password_recovery_token'
+
+    user_id = Column(Integer, ForeignKey('foodie_user.id'), primary_key=True)
+    token = Column(String, nullable=False)
+    creation_date = Column(DateTime, default=datetime.utcnow)
+    expiration = Column(DateTime, nullable=False)
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.token = self.new_token()
+        self.creation_date = datetime.utcnow()
+        self.expiration = self.creation_date + timedelta(days=1)
+
+    @property
+    def expired(self):
+        return datetime.utcnow() > self.expiration
+
+    @staticmethod
+    def new_token():
+        return random_string(length=15)
+
+    @staticmethod
+    def generate_new_token(user_id):
+        """
+        Generate a new token for a given user (first time)
+        """
+        new = PasswordRecoveryToken(user_id)
+        models.Session.add(new)
+        models.Session.commit()
+        return new
+
+    def public_token(self):
+        return f"{self.user_id}.{self.token}"
+
+    def refresh(self):
+        self.token = self.new_token()
+        self.expiration = datetime.utcnow() + timedelta(days=1)
+        models.Session.add(self)
+        models.Session.commit()
+
+    @classmethod
+    def get_user_token(cls, user_id):
+        current = models.Session.query(PasswordRecoveryToken).get(user_id)
+        if not current:
+            return cls.generate_new_token(user_id)
+        elif current.expired:
+            current.refresh()
+            return current
+        else:
+            return current

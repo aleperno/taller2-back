@@ -25,7 +25,6 @@ class NewUser(Resource):
         return user.as_dict(), 201
 
 
-
 class User(Resource):
     def get(self, id=None):
         if id is None:

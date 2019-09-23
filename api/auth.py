@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import request
-from models.users import FoodieUser, AuthToken
-from api.schemas.auth import LoginSchema
+from models.users import FoodieUser, AuthToken, PasswordRecoveryToken
+from api.schemas.auth import LoginSchema, ForgottenPasswordSchema
 from marshmallow import ValidationError
 import models
 
@@ -24,3 +24,16 @@ class Login(Resource):
             return 'Wrong Password', 401
         else:
             return AuthToken.get_user_token(user.id)._as_dict(), 200
+
+
+class ForgotPassword(Resource):
+    def post(self):
+        try:
+            user_email = ForgottenPasswordSchema().load(request.get_json(force=True))
+        except ValidationError as e:
+            return e.messages, 400
+
+        user = FoodieUser.get_by_email(user_email['email'])
+
+        token = PasswordRecoveryToken.get_user_token(user.id)
+        return token.token, 200
