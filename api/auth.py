@@ -2,6 +2,7 @@ from flask_restful import Resource
 from flask import request
 from models.users import FoodieUser, AuthToken, PasswordRecoveryToken
 from api.schemas.auth import LoginSchema, ForgottenPasswordSchema
+from utils.mail import send_token_to_mail
 from marshmallow import ValidationError
 import models
 
@@ -36,4 +37,5 @@ class ForgotPassword(Resource):
         user = FoodieUser.get_by_email(user_email['email'])
 
         token = PasswordRecoveryToken.get_user_token(user.id)
+        send_token_to_mail(token.token, user.email, token.expiration)
         return token.token, 200
