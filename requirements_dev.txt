@@ -4,3 +4,4 @@ pytest-cov
 pytest-mock
 ipython
 coveralls[yaml]
+freezegun

@@ -1,5 +1,5 @@
 from models import Base, engine
-from api.resources import app
+from api.admin_resources import app
 
 
 Base.metadata.create_all(engine)

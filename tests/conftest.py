@@ -6,7 +6,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from models import Base
 from models.users import FoodieUser
 from unittest.mock import PropertyMock
-from api.resources import app
+from api.admin_resources import app
+from freezegun import freeze_time
 
 LOCAL_TEST_DB = 'postgresql://t2user:t2pass@localhost/t2db_test'
 TEST_DB = os.environ.get('TEST_DB', LOCAL_TEST_DB)
@@ -46,8 +47,8 @@ def db_session(mocker):
 def testing_app():
     return app.test_client()
 
-
 @pytest.fixture
+@freeze_time("2019-09-28 13:48:00")
 def one_user(db_session):
     user_data = get_dummy_user(name='Single', surname='User', email='suser@gmail.com')
     user = FoodieUser(id=1, **user_data)
@@ -57,6 +58,7 @@ def one_user(db_session):
 
 
 @pytest.fixture
+@freeze_time("2019-09-28 13:48:00")
 def multiple_users(db_session):
     data1 = get_dummy_user(name='John', surname='Doe', email='jdoe@gmail.com')
     data2 = get_dummy_user(name='Jane', surname='Doe', email='janedoe@gmail.com')

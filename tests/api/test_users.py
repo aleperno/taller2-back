@@ -1,9 +1,11 @@
 import json
 import pytest
+from freezegun import freeze_time
 
 
+@freeze_time("2019-09-28 13:48:00")
 def test_multiple_user(multiple_users, testing_app):
-    r = testing_app.get('/api/users')
+    r = testing_app.get('/api/admin/users')
     assert r.status_code == 200
     assert r.json == [
         {
@@ -14,7 +16,9 @@ def test_multiple_user(multiple_users, testing_app):
             'password': 'insecure',
             'phone': '4444-5555',
             'subscription': 'flat',
-            'role': 'user'
+            'role': 'user',
+            'photo_url': None,
+            'creation_date': '2019-09-28T13:48:00'
         },
         {
             'id': 2,
@@ -24,13 +28,16 @@ def test_multiple_user(multiple_users, testing_app):
             'password': 'insecure',
             'phone': '4444-5555',
             'subscription': 'flat',
-            'role': 'user'
+            'role': 'user',
+            'photo_url': None,
+            'creation_date': '2019-09-28T13:48:00'
         }
     ]
 
 
+@freeze_time("2019-09-28 13:48:00")
 def test_single_user(multiple_users, testing_app):
-    r = testing_app.get('/api/user/1')
+    r = testing_app.get('/api/admin/users/1')
     assert r.status_code == 200
     assert r.json == {
         'id': 1,
@@ -40,26 +47,29 @@ def test_single_user(multiple_users, testing_app):
         'password': 'insecure',
         'phone': '4444-5555',
         'subscription': 'flat',
-        'role': 'user'
+        'role': 'user',
+        'photo_url': None,
+        'creation_date': '2019-09-28T13:48:00'
     }
 
 
 def test_single_nonexistent_user(multiple_users, testing_app):
-    r = testing_app.get('/api/user/999')
+    r = testing_app.get('/api/admin/users/999')
     assert r.status_code == 404
     assert r.json == 'User with id 999 was not found'
 
 
 def test_no_user(db_session, testing_app):
-    r = testing_app.get('/api/users')
+    r = testing_app.get('/api/admin/users')
     assert r.status_code == 200
     assert r.json == []
 
 
+@freeze_time("2019-09-28 13:48:00")
 def test_new_user(db_session, testing_app):
-    # Assert initial status
-    assert testing_app.get('/api/users').json == []
-
+    """
+    Tests the creation of a new user through the API and the server's response
+    """
     # Setup
     json_body = {
         'name': 'Juancito',
@@ -83,8 +93,9 @@ def test_new_user(db_session, testing_app):
         'password': 'insecure',
         'phone': '4781-6140',
         'subscription': 'flat',
-        'role': 'user'
-
+        'role': 'user',
+        'photo_url': None,
+        'creation_date': '2019-09-28T13:48:00'
     }
 
 

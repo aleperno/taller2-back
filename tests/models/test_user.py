@@ -12,6 +12,8 @@ def test_one_user(one_user, db_session):
                               'password': 'insecure',
                               'subscription': 'flat',
                               'role': 'user',
+                              'photo_url': None,
+                              'creation_date': '2019-09-28T13:48:00'
                               }
 
 
