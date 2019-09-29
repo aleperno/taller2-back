@@ -18,7 +18,7 @@ def validates_post_schema(schema):
     return decorator
 
 
-def facebook_get_email(access_token):
+def facebook_get_email(access_token):  # pragma: no cover
     try:
         graph = GraphAPI(access_token=access_token)
         data = graph.request('/me?fields=email')
