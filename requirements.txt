@@ -5,3 +5,4 @@ psycopg2-binary
 marshmallow
 flask-apispec
 alembic
+sendgrid

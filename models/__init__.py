@@ -7,4 +7,17 @@ DEFAULT_URL = 'postgresql+psycopg2://t2user:t2pass@localhost/t2db'
 CONN_URL = os.environ.get('DATABASE_URL', DEFAULT_URL)
 engine = create_engine(CONN_URL)
 Session = scoped_session(sessionmaker(bind=engine))
-Base = declarative_base()
+
+
+class CommonBase(object):
+
+    def save_to_db(self):
+        Session.add(self)
+        Session.commit()
+
+    @classmethod
+    def query(cls):
+        return Session.query(cls)
+
+
+Base = declarative_base(cls=CommonBase)
