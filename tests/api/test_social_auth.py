@@ -29,7 +29,7 @@ def test_facebook_login_bad_token(testing_app, mocker):
     assert r.json == 'Token invalido'
 
 
-def test_facebook_token_inexistente_email(testing_app, mocker):
+def test_facebook_token_inexistente_email(testing_app, db_session, mocker):
     mocker.patch('api.auth.facebook_get_email', return_value='fooo@bar.com')
     json_body = {'fb_access_token': 'fbtoken'}
 
