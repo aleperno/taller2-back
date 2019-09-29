@@ -1,10 +1,10 @@
 import json
 import models
-from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from datetime import timedelta
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from models import Base
-from utils import random_string
+from utils import random_string, utcnow
 
 
 class JSONEncodedValue(TypeDecorator):  # pragma: no cover
@@ -33,6 +33,8 @@ class FoodieUser(Base):
     role = Column(String)
     subscription = Column(String)
     password = Column(String)
+    creation_date = Column(DateTime, default=utcnow)
+    photo_url = Column(String, nullable=True)
 
     def as_dict(self):
         return {
@@ -44,6 +46,8 @@ class FoodieUser(Base):
             'password': self.password,
             'role': self.role,
             'subscription': self.subscription,
+            'photo_url': self.photo_url,
+            'creation_date': self.creation_date.isoformat(),
         }
 
     def is_premium(self):
@@ -55,9 +59,12 @@ class FoodieUser(Base):
     def valid_password(self, password):
         return self.password == password
 
+    def change_password(self, new_password):
+        self.password = new_password
+
     @classmethod
     def get_by_email(cls, email):
-        return models.Session.query(FoodieUser).filter(FoodieUser.email == email).scalar()
+        return cls.query().filter(cls.email == email).scalar()
 
     def __repr__(self):  # pragma: no cover
         return f'Foodie User: id: {self.id}, name: {self.name}'
@@ -73,11 +80,11 @@ class AuthToken(Base):
     def __init__(self, user_id):
         self.user_id = user_id
         self.token = self.new_token()
-        self.expiration = datetime.utcnow() + timedelta(days=1)
+        self.expiration = utcnow() + timedelta(days=1)
 
     def expired(self):
         False
-        #return datetime.utcnow() > self.expiration
+        # return datetime.utcnow() > self.expiration
 
     @staticmethod
     def new_token():
@@ -98,12 +105,98 @@ class AuthToken(Base):
 
     @classmethod
     def get_user_token(cls, user_id):
-        current = models.Session.query(AuthToken).get(user_id)
+        current = cls.query().get(user_id)
         if not current:
             return cls.generate_new_token(user_id)
         else:
             return current
 
+    @classmethod
+    def validate_token(cls, public_token):
+        try:
+            user_id, token = public_token.split('.')
+            user_id = int(user_id)
+        except Exception:
+            return None
+
+        current = cls.query().get(user_id)
+        if not current:
+            return None
+        else:
+            return user_id if current.token == token else None
+
     def _as_dict(self):
         return {'token': self.public_token()}
 
+
+class PasswordRecoveryToken(Base):
+    __tablename__ = 'password_recovery_token'
+
+    user_id = Column(Integer, ForeignKey('foodie_user.id'), primary_key=True)
+    token = Column(String, nullable=False)
+    creation_date = Column(DateTime, default=utcnow)
+    expiration = Column(DateTime, nullable=False)
+    used = Column(Boolean, default=False)
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.token = self.new_token()
+        self.creation_date = utcnow()
+        self.expiration = self.creation_date + timedelta(days=1)
+        self.used = False
+
+    @property
+    def expired(self):
+        return utcnow() > self.expiration
+
+    @property
+    def valid(self):
+        return (not self.expired and not self.used)
+
+    @staticmethod
+    def new_token():
+        return random_string(length=15)
+
+    @staticmethod
+    def _generate_new_token(user_id):
+        """
+        Generate a new token for a given user (first time). NOT intended for 'public' use
+        """
+        new = PasswordRecoveryToken(user_id)
+        new.save_to_db()
+        return new
+
+    def public_token(self):
+        return f"{self.user_id}.{self.token}"
+
+    def refresh(self):
+        self.token = self.new_token()
+        self.expiration = utcnow() + timedelta(days=1)
+        self.used = False
+        self.save_to_db()
+
+    @classmethod
+    def get_user_token(cls, user_id):
+        return cls.query().get(user_id)
+
+    @classmethod
+    def generate_token(cls, user_id):
+        current = cls.get_user_token(user_id)
+        if not current:
+            return cls._generate_new_token(user_id)
+        elif not current.valid:
+            current.refresh()
+            return current
+        else:
+            return current
+
+    @classmethod
+    def validate_user_token(cls, user_id, token):
+        current = cls.query().get(user_id)
+        if current and current.token == token and current.valid:
+            return True
+        else:
+            return False
+
+    def __repr__(self):  # pragma: no cover
+        return f'Token for user {self.user_id}, expiration: {self.expiration}, used: {self.used}'

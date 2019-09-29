@@ -29,6 +29,7 @@ DEFAULT_URL = 'postgresql+psycopg2://t2user:t2pass@localhost/t2db'
 CONN_URL = os.environ.get('DATABASE_URL', DEFAULT_URL)
 config.set_main_option('sqlalchemy.url', CONN_URL)
 
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
