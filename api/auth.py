@@ -56,5 +56,3 @@ class ResetPassword(Resource):
             token_obj.save_to_db()
 
             return 'Password Changed', 200
-
-

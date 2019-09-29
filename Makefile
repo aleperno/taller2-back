@@ -7,4 +7,7 @@ test:
 migrate:
 	alembic upgrade head || alembic stamp head
 
-.PHONY: run, test
+flake_test:
+	flake8 . --count --statistics
+
+.PHONY: run, test, flake_test

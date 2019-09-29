@@ -2,7 +2,7 @@ from flask_restful import Resource
 from flask import request
 from models.users import FoodieUser, AuthToken
 from api.schemas.user import NewUserSchema
-from api.schemas.auth import LoginSchema, RequiresAuthorization
+from api.schemas.auth import RequiresAuthorization
 from marshmallow import ValidationError, EXCLUDE
 import models
 
@@ -11,8 +11,9 @@ def requires_auth(func):
     """
     Decora un endpoint solicitando autorizacion
 
-    El header 'Authorization' debe estar presente y ser valido (token de usuario). Con dicho token se obtiene el
-    `user_id` que se le pasa como parametro al endpoint que se está decorando
+    El header 'Authorization' debe estar presente y ser valido (token de usuario).
+    Con dicho token se obtiene el `user_id` que se le pasa como parametro al endpoint
+    que se está decorando
     """
     def inner(*args, **kwargs):
         try:

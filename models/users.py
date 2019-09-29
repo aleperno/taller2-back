@@ -1,7 +1,7 @@
 import json
 import models
-from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, desc
+from datetime import timedelta
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from models import Base
 from utils import random_string, utcnow
@@ -59,16 +59,12 @@ class FoodieUser(Base):
     def valid_password(self, password):
         return self.password == password
 
-    def save_to_db(self):
-        models.Session.add(self)
-        models.Session.commit()
-
     def change_password(self, new_password):
         self.password = new_password
 
     @classmethod
     def get_by_email(cls, email):
-        return models.Session.query(FoodieUser).filter(FoodieUser.email == email).scalar()
+        return cls.query().filter(cls.email == email).scalar()
 
     def __repr__(self):  # pragma: no cover
         return f'Foodie User: id: {self.id}, name: {self.name}'
@@ -88,7 +84,7 @@ class AuthToken(Base):
 
     def expired(self):
         False
-        #return datetime.utcnow() > self.expiration
+        # return datetime.utcnow() > self.expiration
 
     @staticmethod
     def new_token():
@@ -109,7 +105,7 @@ class AuthToken(Base):
 
     @classmethod
     def get_user_token(cls, user_id):
-        current = models.Session.query(AuthToken).get(user_id)
+        current = cls.query().get(user_id)
         if not current:
             return cls.generate_new_token(user_id)
         else:
@@ -120,10 +116,10 @@ class AuthToken(Base):
         try:
             user_id, token = public_token.split('.')
             user_id = int(user_id)
-        except:
+        except Exception:
             return None
 
-        current = models.Session.query(AuthToken).get(user_id)
+        current = cls.query().get(user_id)
         if not current:
             return None
         else:
@@ -162,9 +158,9 @@ class PasswordRecoveryToken(Base):
         return random_string(length=15)
 
     @staticmethod
-    def generate_new_token(user_id):
+    def _generate_new_token(user_id):
         """
-        Generate a new token for a given user (first time)
+        Generate a new token for a given user (first time). NOT intended for 'public' use
         """
         new = PasswordRecoveryToken(user_id)
         new.save_to_db()
@@ -179,19 +175,15 @@ class PasswordRecoveryToken(Base):
         self.used = False
         self.save_to_db()
 
-    def save_to_db(self):
-        models.Session.add(self)
-        models.Session.commit()
-
     @classmethod
     def get_user_token(cls, user_id):
-        return models.Session.query(cls).get(user_id)
+        return cls.query().get(user_id)
 
     @classmethod
     def generate_token(cls, user_id):
         current = cls.get_user_token(user_id)
         if not current:
-            return cls.generate_new_token(user_id)
+            return cls._generate_new_token(user_id)
         elif not current.valid:
             current.refresh()
             return current
@@ -200,7 +192,7 @@ class PasswordRecoveryToken(Base):
 
     @classmethod
     def validate_user_token(cls, user_id, token):
-        current = models.Session.query(PasswordRecoveryToken).get(user_id)
+        current = cls.query().get(user_id)
         if current and current.token == token and current.valid:
             return True
         else:

@@ -1,6 +1,8 @@
 import json
 import pytest
 from freezegun import freeze_time
+from datetime import datetime, timedelta
+from models.users import PasswordRecoveryToken
 
 
 @freeze_time("2019-09-28 13:48:00")
@@ -179,3 +181,62 @@ def test_login_missing_field(missing, testing_app):
     )
     assert r.status_code == 400
     assert r.json == {missing: ['Missing data for required field.']}
+
+
+@freeze_time("2019-09-28 13:48:12")
+def test_forgot_password(mocker, one_user, testing_app):
+    send_mail = mocker.patch('api.auth.send_token_to_mail')
+    mocker.patch('models.users.random_string', return_value="abcdDCBA")
+    json_body = {
+        'email': 'suser@gmail.com',
+    }
+    r = testing_app.post(
+        '/api/forgot_password',
+        data=json.dumps(json_body),
+    )
+    assert r.status_code == 200
+    send_mail.assert_called_once_with('abcdDCBA',
+                                      one_user.email,
+                                      datetime.utcnow()+timedelta(days=1))
+
+
+@pytest.mark.parametrize("email", (None, 'foo@gmail.com', 'sarasa'))
+def test_forgot_password_error(one_user, testing_app, email):
+    """
+    Tests for errors in the Forgot Password API
+     - Missing email field
+     - Non-existent mail
+     - invalid mail format
+    """
+    json_body = {}
+    if email:
+        json_body['email'] = email
+
+    r = testing_app.post(
+        '/api/forgot_password',
+        data=json.dumps(json_body),
+    )
+
+    assert r.status_code == 400
+
+
+def test_reset_password(one_user, testing_app):
+    token = PasswordRecoveryToken.generate_token(one_user.id)
+    new_password = '123456'
+    assert one_user.password != new_password
+    assert token.valid is True
+    json_body = {
+        'email': one_user.email,
+        'token': token.token,
+        'password': new_password,
+        'confirm_password': new_password
+    }
+    r = testing_app.post(
+        '/api/reset_password',
+        data=json.dumps(json_body),
+    )
+    assert r.status_code == 200
+    assert r.json == 'Password Changed'
+
+    assert token.valid is False  # Token Cannot be reused
+    assert one_user.password == new_password  # User password changed

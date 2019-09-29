@@ -37,15 +37,17 @@ def db_session(mocker):
     Base.metadata.create_all(engine)
     mocked_session = PropertyMock(return_value=Session)
     mocker.patch('models.Session', new_callable=mocked_session)
+    # mocker.patch('models.create_engine', return_value=engine)
     yield Session
     Session.close_all()
-    #Session().close_all_sessions()
+    # Session().close_all_sessions()
     Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(scope='session')
 def testing_app():
     return app.test_client()
+
 
 @pytest.fixture
 @freeze_time("2019-09-28 13:48:00")
