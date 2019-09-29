@@ -6,3 +6,4 @@ marshmallow
 flask-apispec
 alembic
 sendgrid
+facebook-sdk

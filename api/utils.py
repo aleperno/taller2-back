@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import request
 from marshmallow import ValidationError
+from facebook import GraphAPI, GraphAPIError
 
 
 def validates_post_schema(schema):
@@ -15,3 +16,12 @@ def validates_post_schema(schema):
 
         return wrapper
     return decorator
+
+
+def facebook_get_email(access_token):  # pragma: no cover
+    try:
+        graph = GraphAPI(access_token=access_token)
+        data = graph.request('/me?fields=email')
+        return data.get('email')
+    except GraphAPIError:
+        return None

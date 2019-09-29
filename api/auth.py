@@ -1,8 +1,12 @@
 from flask_restful import Resource
 from flask import request
 from models.users import FoodieUser, AuthToken, PasswordRecoveryToken
-from api.schemas.auth import LoginSchema, ForgottenPasswordSchema, ResetPasswordSchema
-from api.utils import validates_post_schema
+from api.schemas.auth import (LoginSchema,
+                              ForgottenPasswordSchema,
+                              ResetPasswordSchema,
+                              FacebookLoginSchema,
+                              )
+from api.utils import validates_post_schema, facebook_get_email
 from utils.mail import send_token_to_mail
 from marshmallow import ValidationError
 
@@ -22,6 +26,24 @@ class Login(Resource):
             return 'Wrong Password', 401
         else:
             return AuthToken.get_user_token(user.id)._as_dict(), 200
+
+
+class FacebookLogin(Resource):
+    @validates_post_schema(FacebookLoginSchema)
+    def post(self, post_data):
+        access_token = post_data['fb_access_token']
+
+        email = facebook_get_email(access_token)
+
+        if not email:
+            # Puede que el token sea invalido
+            return "Token invalido", 400
+
+        user = FoodieUser.get_by_email(email)
+        if not user:
+            return "Usuario inexistente", 404
+
+        return AuthToken.get_user_token(user.id)._as_dict(), 200
 
 
 class ForgotPassword(Resource):

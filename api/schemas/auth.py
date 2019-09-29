@@ -33,3 +33,7 @@ class RequiresAuthorization(Schema):
         additional_properties = fields.Raw()
 
     Authorization = fields.Str(required=True)
+
+
+class FacebookLoginSchema(Schema):
+    fb_access_token = fields.Str(required=True)
