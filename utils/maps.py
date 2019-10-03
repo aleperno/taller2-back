@@ -1,7 +1,7 @@
 import os
 from googlemaps import Client
 
-GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY', 'AIzaSyB2ycDcEYiMs3xFhsW9qjf1CPMKLksXfPw')
+GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
 
 
 def distance_between(origin, destination):
