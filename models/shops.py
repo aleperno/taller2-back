@@ -25,6 +25,17 @@ class FoodieShop(Base):
             d['creation_date'] = d['creation_date'].isoformat()
         return d
 
+    def _as_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "address": self.address,
+            "location": self.location,
+            "category": self.category,
+            "creation_date": self.creation_date.isoformat()
+        }
+
 
 class Product(Base):
     __tablename__ = 'product'
