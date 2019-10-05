@@ -23,7 +23,7 @@ class Product(Base):
     __tablename__ = 'product'
 
     id = Column(Integer, primary_key=True)
-    shop_id = Column(Integer, ForeignKey('foodie_user.id'))
+    shop_id = Column(Integer, ForeignKey('foodie_shop.id'))
     name = Column(String)
     description = Column(String)
     category = Column(String)
