@@ -1,7 +1,7 @@
 import json
 import models
 from datetime import timedelta
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from models import Base
 from utils import random_string, utcnow
@@ -18,24 +18,6 @@ class FoodieShop(Base):
     category = Column(String)
     creation_date = Column(DateTime, default=utcnow)
 
-    def as_dict(self):
-        d = self.__dict__
-        d.pop('_sa_instance_state')
-        if 'creation_date' in d:
-            d['creation_date'] = d['creation_date'].isoformat()
-        return d
-
-    def _as_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "description": self.description,
-            "address": self.address,
-            "location": self.location,
-            "category": self.category,
-            "creation_date": self.creation_date.isoformat()
-        }
-
 
 class Product(Base):
     __tablename__ = 'product'
@@ -45,12 +27,9 @@ class Product(Base):
     name = Column(String)
     description = Column(String)
     category = Column(String)
-    price = Column(String)
+    price = Column(Float)
     creation_date = Column(DateTime, default=utcnow)
 
-    def as_dict(self):
-        d = self.__dict__
-        d.pop('_sa_instance_state')
-        if 'creation_date' in d:
-            d['creation_date'] = d['creation_date'].isoformat()
-        return d
+    @classmethod
+    def get_shop_products(cls, shop_id):
+        return cls.query().filter(cls.shop_id==shop_id).all()

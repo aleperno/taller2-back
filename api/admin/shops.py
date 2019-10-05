@@ -21,10 +21,11 @@ class Shops(Resource):
     def post(self, post_data):
         new_shop = FoodieShop(**post_data)
         new_shop.save_to_db()
-        return new_shop._as_dict(), 200
+        return new_shop.as_dict(), 200
 
 
 class Products(Resource):
+    # TODO: Hacer esto bien, tomando los optional args
     def get(self):
         shop_id = request.args.get('shop_id')
         product_id = request.args.get('product_id')
@@ -46,7 +47,7 @@ class Products(Resource):
 
     @validates_post_schema(NewProductSchema)
     def post(self, post_data):
-        new_shop = FoodieShop(**post_data)
+        new_shop = Product(**post_data)
         new_shop.save_to_db()
 
         return new_shop.as_dict(), 200
