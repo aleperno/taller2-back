@@ -55,6 +55,13 @@ class Order(Base):
     user_id = Column(Integer, ForeignKey('foodie_user.id'))
     user_location = Column(String)
     shop_location = Column(String)
-    distance = Column(Float)
+    distance = Column(Integer)
     status = Column(String)
     products = Column(JSONEncodedValue)
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.status = 'pending'
+        self.distance = 445
+        self.shop_location = FoodieShop.get_by_id(self.shop_id).location

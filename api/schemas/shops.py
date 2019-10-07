@@ -4,7 +4,7 @@ from marshmallow import (
     validates_schema,
     ValidationError,
     )
-from api.validators import shop_exists, product_exists, product_belongs_shop
+from api.validators import shop_exists, product_exists, product_belongs_shop, user_id_exists
 
 
 class NewShopSchema(Schema):
@@ -29,7 +29,7 @@ class ItemSchema(Schema):
 
 
 class OrderSchema(Schema):
-    user_id = fields.Int(required=True)
+    user_id = fields.Int(required=True, validate=user_id_exists)
     shop_id = fields.Int(required=True, validate=shop_exists)
     products = fields.List(fields.Nested(ItemSchema), required=True)
     user_location = fields.Str(required=True)
