@@ -20,6 +20,11 @@ def email_exists(email):
         raise ValidationError('Email not found')
 
 
+def user_id_exists(user_id):
+    if not FoodieUser.get_by_id(user_id):
+        raise ValidationError(f'User {user_id} doesnt exist', field_name='user_id')
+
+
 def shop_exists(shop_id):
     if not FoodieShop.query().get(shop_id):
         raise ValidationError(f'Shop id {shop_id} doesnt exist')
