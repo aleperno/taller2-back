@@ -3,7 +3,8 @@ import models
 from datetime import timedelta
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.types import TypeDecorator, VARCHAR
-from models import Base
+from models import Base, JSONEncodedValue
+from models.users import FoodieUser
 from utils import random_string, utcnow
 
 
@@ -33,3 +34,27 @@ class Product(Base):
     @classmethod
     def get_shop_products(cls, shop_id):
         return cls.query().filter(cls.shop_id==shop_id).all()
+
+    @classmethod
+    def product_belongs_shop(cls, product_id, shop_id):
+        """
+        Returns if a given product belongs to a given shop
+        """
+        product = cls.query().get(product_id)
+        if product:
+            return product.shop_id == shop_id
+        else:
+            return False
+
+
+class Order(Base):
+    __tablename__ = 'orders'
+
+    id = Column(Integer, primary_key=True)
+    shop_id = Column(Integer, ForeignKey('foodie_shop.id'))
+    user_id = Column(Integer, ForeignKey('foodie_user.id'))
+    user_location = Column(String)
+    shop_location = Column(String)
+    distance = Column(Float)
+    status = Column(String)
+    products = Column(JSONEncodedValue)
