@@ -1,8 +1,11 @@
 import os
+import json
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.types import TypeDecorator, VARCHAR
+
 
 DEFAULT_URL = 'postgresql+psycopg2://t2user:t2pass@localhost/t2db'
 CONN_URL = os.environ.get('DATABASE_URL', DEFAULT_URL)
@@ -24,6 +27,10 @@ class CommonBase(object):
     def get_all(self):
         return [r.as_dict() for r in self.query().all()]
 
+    @classmethod
+    def get_by_id(cls, _id):
+        return cls.query().get(_id)
+
     def as_dict(self):
         d = {}
         cols = [ c.name for c in self.__table__.columns ]
@@ -35,6 +42,20 @@ class CommonBase(object):
                 d[col] = value
         return d
 
+
+class JSONEncodedValue(TypeDecorator):  # pragma: no cover
+    impl = VARCHAR
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = json.dumps(value)
+
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            value = json.loads(value)
+        return value
 
 
 Base = declarative_base(cls=CommonBase)

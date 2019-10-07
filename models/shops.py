@@ -3,7 +3,8 @@ import models
 from datetime import timedelta
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.types import TypeDecorator, VARCHAR
-from models import Base
+from models import Base, JSONEncodedValue
+from models.users import FoodieUser
 from utils import random_string, utcnow
 
 
