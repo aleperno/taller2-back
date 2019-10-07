@@ -4,7 +4,6 @@ from api.schemas.shops import OrderSchema
 from api.utils import validates_post_schema
 
 
-
 class Shops(Resource):
     def get(self):
         return FoodieShop.get_all()
@@ -22,4 +21,3 @@ class OrderEndpoint(Resource):
         order = Order(**post_data)
         order.save_to_db()
         return 'Ok', 200
-

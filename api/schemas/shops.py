@@ -43,5 +43,5 @@ class OrderSchema(Schema):
         for product in products:
             product_id = product['id']
             if not product_belongs_shop(product_id, shop_id):
-                raise ValidationError(f'Product {product_id} does not belong to shop {shop_id}', field_name='products')
-
+                raise ValidationError(f'Product {product_id} does not belong to shop {shop_id}',
+                                      field_name='products')
