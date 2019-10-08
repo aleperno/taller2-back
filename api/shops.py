@@ -4,7 +4,6 @@ from api.schemas.shops import OrderSchema
 from api.utils import validates_post_schema
 
 
-
 class Shops(Resource):
     def get(self):
         return FoodieShop.get_all()

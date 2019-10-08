@@ -2,24 +2,8 @@ import json
 import models
 from datetime import timedelta
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
-from sqlalchemy.types import TypeDecorator, VARCHAR
 from models import Base
 from utils import random_string, utcnow
-
-
-class JSONEncodedValue(TypeDecorator):  # pragma: no cover
-    impl = VARCHAR
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            value = json.dumps(value)
-
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value is not None:
-            value = json.loads(value)
-        return value
 
 
 class FoodieUser(Base):
