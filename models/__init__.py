@@ -24,8 +24,12 @@ class CommonBase(object):
         return Session.query(cls)
 
     @classmethod
-    def get_all(self):
-        return [r.as_dict() for r in self.query().all()]
+    def get_all(cls):
+        return cls.query().all()
+
+    @classmethod
+    def get_all_dict(cls):
+        return [r.as_dict() for r in cls.get_all()]
 
     @classmethod
     def get_by_id(cls, _id):

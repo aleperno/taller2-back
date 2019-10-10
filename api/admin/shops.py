@@ -2,7 +2,7 @@ from flask_restful import Resource
 from flask import request
 from api.utils import validates_post_schema
 from api.schemas.shops import NewShopSchema, NewProductSchema
-from models.shops import FoodieShop, Product
+from models.shops import FoodieShop, Product, Order
 
 
 class Shops(Resource):
@@ -51,3 +51,8 @@ class Products(Resource):
         new_shop.save_to_db()
 
         return new_shop.as_dict(), 200
+
+
+class Orders(Resource):
+    def get(self):
+        return Order.get_all_dict(), 200

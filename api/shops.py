@@ -6,7 +6,7 @@ from api.utils import validates_post_schema
 
 class Shops(Resource):
     def get(self):
-        return FoodieShop.get_all()
+        return FoodieShop.get_all_dict()
 
 
 class ShopProducts(Resource):
