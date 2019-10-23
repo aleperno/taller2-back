@@ -7,3 +7,4 @@ flask-apispec
 alembic
 sendgrid
 facebook-sdk
+flask-cors

@@ -1,10 +1,12 @@
 from flask import Flask
 from flask_restful import Api
+from flask_cors import CORS
 from api.user import NewUser, User
 from api.auth import Login, ForgotPassword, ResetPassword, FacebookLogin
 from api.shops import ShopProducts, Shops, OrderEndpoint
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 
 # Authorization Resources
