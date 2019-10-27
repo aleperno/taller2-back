@@ -20,7 +20,8 @@ def test_multiple_user(multiple_users, testing_app):
             'subscription': 'flat',
             'role': 'user',
             'photo_url': None,
-            'creation_date': '2019-09-28T13:48:00'
+            'creation_date': '2019-09-28T13:48:00',
+            'status': 'active'
         },
         {
             'id': 2,
@@ -32,7 +33,8 @@ def test_multiple_user(multiple_users, testing_app):
             'subscription': 'flat',
             'role': 'user',
             'photo_url': None,
-            'creation_date': '2019-09-28T13:48:00'
+            'creation_date': '2019-09-28T13:48:00',
+            'status': 'active'
         }
     ]
 
@@ -51,7 +53,8 @@ def test_single_user(multiple_users, testing_app):
         'subscription': 'flat',
         'role': 'user',
         'photo_url': None,
-        'creation_date': '2019-09-28T13:48:00'
+        'creation_date': '2019-09-28T13:48:00',
+        'status': 'active'
     }
 
 
@@ -97,7 +100,8 @@ def test_new_user(db_session, testing_app):
         'subscription': 'flat',
         'role': 'user',
         'photo_url': None,
-        'creation_date': '2019-09-28T13:48:00'
+        'creation_date': '2019-09-28T13:48:00',
+        'status': 'active'
     }
 
 

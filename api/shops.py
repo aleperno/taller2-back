@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from models.shops import Product, FoodieShop, Order
 from api.schemas.shops import OrderSchema
-from api.utils import validates_post_schema
+from api.utils.__init__ import validates_post_schema
 
 
 class Shops(Resource):

@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import request
-from api.utils import validates_post_schema
+from api.utils.__init__ import validates_post_schema
 from api.schemas.shops import NewShopSchema, NewProductSchema
 from models.shops import FoodieShop, Product, Order
 

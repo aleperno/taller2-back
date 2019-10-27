@@ -1,31 +1,42 @@
 from flask_restful import Resource
 from flask import request
 from models.users import FoodieUser, AuthToken, PasswordRecoveryToken
+from models.admins import FoodieAdmin, AdminAuthToken
 from api.schemas.auth import (LoginSchema,
                               ForgottenPasswordSchema,
                               ResetPasswordSchema,
                               FacebookLoginSchema,
                               )
-from api.utils import validates_post_schema, facebook_get_email
+from api.utils.__init__ import validates_post_schema, facebook_get_email
 from utils.mail import send_token_to_mail
 from marshmallow import ValidationError
 
 
-class Login(Resource):
+class UserLogin(Resource):
+
+    token_cls = AuthToken
+    user_cls = FoodieUser
+
     @validates_post_schema(LoginSchema)
     def post(self, post_data):
         user_data = post_data
         email = user_data['email']
         password = user_data['password']
 
-        user = FoodieUser.get_by_email(email)
+        user = self.user_cls.get_by_email(email)
 
         if not user:
             return 'User not found', 404
         elif not user.valid_password(password):
             return 'Wrong Password', 401
         else:
-            return AuthToken.get_user_token(user.id)._as_dict(), 200
+            token = self.token_cls.get_user_token(user.id)._as_dict()
+            return token, 200, {'Authorization': token['token']}
+
+
+class AdminLogin(UserLogin):
+    token_cls = AdminAuthToken
+    user_cls = FoodieAdmin
 
 
 class FacebookLogin(Resource):

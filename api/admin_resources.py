@@ -1,8 +1,29 @@
 from api.resources import api, app # noqa
 from api.admin.users import ListUsers
+from api.admin.admins import NewAdmin, ChangePassword
 from api.admin.shops import Shops, Products, Orders
+from api.auth import AdminLogin
+from models.admins import FoodieAdmin
 
 
+def check_admin_status():
+    if not FoodieAdmin.get_all():
+        # Need to create a default admin
+        admin = FoodieAdmin(email='admin@foodie.com',
+                            name='foodie',
+                            surname='example',
+                            password='admin123')
+        admin.save_to_db()
+
+
+# New Admins
+api.add_resource(NewAdmin, "/api/admin/new_admin")
+
+# Auth
+api.add_resource(AdminLogin, "/api/admin/login")
+api.add_resource(ChangePassword, "/api/admin/change_password")
+
+# Resources
 api.add_resource(ListUsers, "/api/admin/users/<int:user_id>")
 api.add_resource(ListUsers, "/api/admin/users", endpoint='users')
 api.add_resource(Shops, "/api/admin/shops/<int:shop_id>")
