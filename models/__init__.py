@@ -35,6 +35,10 @@ class CommonBase(object):
     def get_by_id(cls, _id):
         return cls.query().get(_id)
 
+    @classmethod
+    def get_by_ids(cls, _ids):
+        return cls.query().filter(cls.id.in_(_ids)).all()
+
     def as_dict(self):
         d = {}
         cols = [ c.name for c in self.__table__.columns ]
