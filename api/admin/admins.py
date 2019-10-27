@@ -1,13 +1,12 @@
 from flask import request
 from flask_restful import Resource
-from api.utils import validates_post_schema
+from api.utils import validates_post_schema, AdminResource
 from api.schemas.admins import NewAdminSchema, ChangePasswordSchema
-from api.utils.auth import requires_admin_auth
 from models.admins import FoodieAdmin
 
 
-class Admins(Resource):
-    @requires_admin_auth
+class Admins(AdminResource):
+
     def get(self, *args, **kwargs):
         raw_admin_ids = request.args.get('admin_id')
         if raw_admin_ids:
@@ -18,7 +17,6 @@ class Admins(Resource):
 
         return [adm.as_dict() for adm in admins], 200
 
-    @requires_admin_auth
     @validates_post_schema(NewAdminSchema)
     def post(self, post_data, **kw):
         email = post_data['email']
@@ -28,7 +26,6 @@ class Admins(Resource):
 
         return new_adm.as_dict(), 201
 
-    @requires_admin_auth
     @validates_post_schema(ChangePasswordSchema)
     def put(self, post_data, admin_id):
         admin = FoodieAdmin.get_by_id(admin_id)
