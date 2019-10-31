@@ -15,12 +15,30 @@ class NewShopSchema(Schema):
     category = fields.Str(required=True)
 
 
+class EditShopSchema(Schema):
+    id = fields.Int(required=True, validate=shop_exists)
+    name = fields.Str()
+    description = fields.Str()
+    address = fields.Str()
+    location = fields.Str()
+    category = fields.Str()
+
+
 class NewProductSchema(Schema):
     shop_id = fields.Int(required=True, validate=shop_exists)
     name = fields.Str(required=True)
     description = fields.Str(required=True)
     category = fields.Str(required=True)
     price = fields.Float(required=True)
+
+
+class EditProductSchema(Schema):
+    id = fields.Int(required=True, validate=product_exists)
+    shop_id = fields.Int(validate=shop_exists)
+    name = fields.Str()
+    description = fields.Str()
+    category = fields.Str()
+    price = fields.Float()
 
 
 class ItemSchema(Schema):
