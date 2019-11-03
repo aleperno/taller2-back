@@ -51,6 +51,7 @@ class OrderSchema(Schema):
     shop_id = fields.Int(required=True, validate=shop_exists)
     products = fields.List(fields.Nested(ItemSchema), required=True)
     user_location = fields.Str(required=True)
+    favor = fields.Boolean(required=False, default=False)
 
     @validates_schema
     def validate_products(self, data, **kw):

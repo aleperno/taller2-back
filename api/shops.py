@@ -16,6 +16,9 @@ class ShopProducts(Resource):
 
 
 class OrderEndpoint(Resource):
+    def get(self):
+        return Order.get_all_dict(), 200
+
     @validates_post_schema(OrderSchema)
     def post(self, post_data):
         order = Order(**post_data)

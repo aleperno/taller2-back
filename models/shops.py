@@ -1,7 +1,7 @@
 import json
 import models
 from datetime import timedelta
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Boolean
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from models import Base, JSONEncodedValue
 from models.users import FoodieUser
@@ -57,8 +57,9 @@ class Order(Base):
     shop_location = Column(String)
     distance = Column(Integer)
     status = Column(String)
+    favor = Column(Boolean, default=False)
     products = Column(JSONEncodedValue)
-
+    price = Column(Float)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -2,9 +2,10 @@ import os
 import json
 from datetime import datetime
 from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.types import TypeDecorator, VARCHAR
+from utils import utcnow
 
 
 DEFAULT_URL = 'postgresql+psycopg2://t2user:t2pass@localhost/t2db'
@@ -14,6 +15,7 @@ Session = scoped_session(sessionmaker(bind=engine))
 
 
 class CommonBase(object):
+    creation_date = Column(DateTime, default=utcnow)
 
     def save_to_db(self):
         Session.add(self)
