@@ -60,6 +60,7 @@ class Order(Base):
     favor = Column(Boolean, default=False)
     products = Column(JSONEncodedValue)
     price = Column(Float)
+    creation_date = Column(DateTime, default=utcnow)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

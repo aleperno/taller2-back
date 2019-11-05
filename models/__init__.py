@@ -15,7 +15,6 @@ Session = scoped_session(sessionmaker(bind=engine))
 
 
 class CommonBase(object):
-    creation_date = Column(DateTime, default=utcnow)
 
     def save_to_db(self):
         Session.add(self)
