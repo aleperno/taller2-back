@@ -1,11 +1,6 @@
-import json
-import models
-from datetime import timedelta
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Boolean
-from sqlalchemy.types import TypeDecorator, VARCHAR
 from models import Base, JSONEncodedValue
-from models.users import FoodieUser
-from utils import random_string, utcnow
+from utils import utcnow
 
 
 class FoodieShop(Base):
@@ -53,6 +48,7 @@ class Order(Base):
     id = Column(Integer, primary_key=True)
     shop_id = Column(Integer, ForeignKey('foodie_shop.id'))
     user_id = Column(Integer, ForeignKey('foodie_user.id'))
+    delivery_id = Column(Integer, ForeignKey('foodie_user.id'))
     user_location = Column(String)
     shop_location = Column(String)
     distance = Column(Integer)
