@@ -1,9 +1,11 @@
 import json
 import models
 from datetime import timedelta
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, or_
 from models import Base
 from utils import random_string, utcnow
+from models.deliveries import DeliveryStatus
+from models.shops import Order
 
 
 class BaseUser(Base):
@@ -45,6 +47,21 @@ class FoodieUser(BaseUser):
 
     def is_user(self):
         return self.role == 'user'
+
+    def available_for_delivery(self):
+        location = DeliveryStatus.get_by_id(self.id)
+        if not location or location.expired:
+            return False
+        else:
+            return location.is_available
+
+    def public_info(self):
+        data = {
+            'name': self.name,
+            'surname': self.surname,
+            'reputation': None,
+        }
+        return data
 
     def __repr__(self):  # pragma: no cover
         return f'Foodie User: id: {self.id}, name: {self.name}'
