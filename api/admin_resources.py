@@ -1,6 +1,6 @@
 from api.resources import api, app # noqa
-from api.admin.users import ListUsers
-from api.admin.admins import Admins
+from api.admin.users import Users
+from api.admin.admins import Admins, NewAdmin, ChangePassword
 from api.admin.shops import Shops, Products, Orders
 from api.auth import AdminLogin
 from models.admins import FoodieAdmin
@@ -17,18 +17,18 @@ def check_admin_status():
 
 
 # New Admins
-#api.add_resource(NewAdmin, "/api/admin/new_admin")
+api.add_resource(NewAdmin, "/api/admin/new_admin")
 
 # Auth
 api.add_resource(AdminLogin, "/api/admin/login")
-#api.add_resource(ChangePassword, "/api/admin/change_password")
+api.add_resource(ChangePassword, "/api/admin/change_password")
 
 # Admin Resources
 api.add_resource(Admins, "/api/admin/admins")
 
 # Resources
-api.add_resource(ListUsers, "/api/admin/users/<int:user_id>")
-api.add_resource(ListUsers, "/api/admin/users", endpoint='users')
+api.add_resource(Users, "/api/admin/users/<int:user_id>")
+api.add_resource(Users, "/api/admin/users", endpoint='userss')
 api.add_resource(Shops, "/api/admin/shops/<int:shop_id>")
 api.add_resource(Shops, "/api/admin/shops", endpoint='shopss')
 api.add_resource(Products, "/api/admin/products")

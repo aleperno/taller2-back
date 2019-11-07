@@ -36,9 +36,9 @@ class Admins(AdminResource):
 
         return 'ok', 200
 
-"""
+
 class NewAdmin(Resource):
-    @requires_admin_auth
+    #@requires_admin_auth
     @validates_post_schema(NewAdminSchema)
     def post(self, post_data, **kw):
         email = post_data['email']
@@ -50,7 +50,7 @@ class NewAdmin(Resource):
 
 
 class ChangePassword(Resource):
-    @requires_admin_auth
+    #@requires_admin_auth
     @validates_post_schema(ChangePasswordSchema)
     def put(self, post_data, admin_id):
         admin = FoodieAdmin.get_by_id(admin_id)
@@ -60,4 +60,3 @@ class ChangePassword(Resource):
         admin.save_to_db()
 
         return 'ok', 200
-"""
