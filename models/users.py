@@ -48,6 +48,10 @@ class FoodieUser(BaseUser):
     def is_user(self):
         return self.role == 'user'
 
+    @property
+    def is_delivery(self):
+        return self.role == 'delivery'
+
     def available_for_delivery(self):
         location = DeliveryStatus.get_by_id(self.id)
         if not location or location.expired:

@@ -51,6 +51,11 @@ class CommonBase(object):
                 d[col] = value
         return d
 
+    def update_from_dict(self, **kw):
+        for k, v in kw.items():
+            setattr(self, k, v)
+
+
 
 class JSONEncodedValue(TypeDecorator):  # pragma: no cover
     impl = VARCHAR
