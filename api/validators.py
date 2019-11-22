@@ -3,7 +3,7 @@ from marshmallow import (ValidationError,
                          )
 from models.users import FoodieUser
 from models.admins import FoodieAdmin
-from models.shops import FoodieShop, Product
+from models.shops import FoodieShop, Product, Order
 
 
 password_validate = validate.Length(min=6)
@@ -30,6 +30,11 @@ def email_exists(email):
 def user_id_exists(user_id):
     if not FoodieUser.get_by_id(user_id):
         raise ValidationError(f'User {user_id} doesnt exist', field_name='user_id')
+
+
+def order_exists(order_id):
+    if not Order.get_by_id(order_id):
+        raise ValidationError(f'Order {order_id} doesnt exist', field_name='order_id')
 
 
 def shop_exists(shop_id):
