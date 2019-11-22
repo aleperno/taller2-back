@@ -1,60 +1,23 @@
 import json
 import models
 from datetime import timedelta
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
-from sqlalchemy.types import TypeDecorator, VARCHAR
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, or_
 from models import Base
 from utils import random_string, utcnow
+from models.deliveries import DeliveryStatus
+from models.shops import Order
 
 
-class JSONEncodedValue(TypeDecorator):  # pragma: no cover
-    impl = VARCHAR
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            value = json.dumps(value)
-
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value is not None:
-            value = json.loads(value)
-        return value
-
-
-class FoodieUser(Base):
-    __tablename__ = 'foodie_user'
+class BaseUser(Base):
+    __abstract__ = True
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
     surname = Column(String)
     email = Column(String, unique=True)
-    phone = Column(String)
-    role = Column(String)
-    subscription = Column(String)
     password = Column(String)
     creation_date = Column(DateTime, default=utcnow)
-    photo_url = Column(String, nullable=True)
-
-    def as_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'surname': self.surname,
-            'email': self.email,
-            'phone': self.phone,
-            'password': self.password,
-            'role': self.role,
-            'subscription': self.subscription,
-            'photo_url': self.photo_url,
-            'creation_date': self.creation_date.isoformat(),
-        }
-
-    def is_premium(self):
-        return self.subscription == 'premium'
-
-    def is_user(self):
-        return self.role == 'user'
+    status = Column(String, default="active")
 
     def valid_password(self, password):
         return self.password == password
@@ -62,18 +25,55 @@ class FoodieUser(Base):
     def change_password(self, new_password):
         self.password = new_password
 
+    @property
+    def is_active(self):
+        return self.status == 'active'
+
     @classmethod
     def get_by_email(cls, email):
         return cls.query().filter(cls.email == email).scalar()
+
+
+class FoodieUser(BaseUser):
+    __tablename__ = 'foodie_user'
+
+    phone = Column(String)
+    role = Column(String)
+    subscription = Column(String)
+    photo_url = Column(String, nullable=True)
+
+    def is_premium(self):
+        return self.subscription == 'premium'
+
+    def is_user(self):
+        return self.role == 'user'
+
+    @property
+    def is_delivery(self):
+        return self.role == 'delivery'
+
+    def available_for_delivery(self):
+        location = DeliveryStatus.get_by_id(self.id)
+        if not location or location.expired:
+            return False
+        else:
+            return location.is_available
+
+    def public_info(self):
+        data = {
+            'name': self.name,
+            'surname': self.surname,
+            'reputation': None,
+        }
+        return data
 
     def __repr__(self):  # pragma: no cover
         return f'Foodie User: id: {self.id}, name: {self.name}'
 
 
-class AuthToken(Base):
-    __tablename__ = 'auth_token'
+class BaseAuthToken(Base):
+    __abstract__ = True
 
-    user_id = Column(Integer, ForeignKey('foodie_user.id'), primary_key=True)
     token = Column(String, nullable=False)
     expiration = Column(DateTime, nullable=False)
 
@@ -90,12 +90,12 @@ class AuthToken(Base):
     def new_token():
         return random_string(length=15)
 
-    @staticmethod
-    def generate_new_token(user_id):
+    @classmethod
+    def generate_new_token(cls, _id):
         """
         Generate a new token for a given user (first time)
         """
-        new = AuthToken(user_id)
+        new = cls(_id)
         models.Session.add(new)
         models.Session.commit()
         return new
@@ -104,10 +104,10 @@ class AuthToken(Base):
         return f"{self.user_id}.{self.token}"
 
     @classmethod
-    def get_user_token(cls, user_id):
-        current = cls.query().get(user_id)
+    def get_user_token(cls, _id):
+        current = cls.query().get(_id)
         if not current:
-            return cls.generate_new_token(user_id)
+            return cls.generate_new_token(_id)
         else:
             return current
 
@@ -127,6 +127,12 @@ class AuthToken(Base):
 
     def _as_dict(self):
         return {'token': self.public_token()}
+
+
+class AuthToken(BaseAuthToken):
+        __tablename__ = 'auth_token'
+
+        user_id = Column(Integer, ForeignKey('foodie_user.id'), primary_key=True)
 
 
 class PasswordRecoveryToken(Base):

@@ -1,7 +1,9 @@
 from functools import wraps
 from flask import request
+from flask_restful import Resource
 from marshmallow import ValidationError
 from facebook import GraphAPI, GraphAPIError
+from .auth import requires_admin_auth
 
 
 def validates_post_schema(schema):
@@ -25,3 +27,7 @@ def facebook_get_email(access_token):  # pragma: no cover
         return data.get('email')
     except GraphAPIError:
         return None
+
+
+class AdminResource(Resource):
+    decorators = [ requires_admin_auth ]
