@@ -57,9 +57,13 @@ class Order(Base):
     products = Column(JSONEncodedValue)
     price = Column(Float)
     creation_date = Column(DateTime, default=utcnow)
+    order_metadata = Column(JSONEncodedValue)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.status = 'pending'
         self.distance = 445
         self.shop_location = FoodieShop.get_by_id(self.shop_id).location
+        self.order_metadata = {
+            'creation_date': self.creation_date,
+        }
