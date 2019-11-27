@@ -21,7 +21,7 @@ class Shops(Resource):
     def post(self, post_data):
         new_shop = FoodieShop(**post_data)
         new_shop.save_to_db()
-        return new_shop.as_dict(), 200
+        return new_shop.as_dict(), 201
 
     @validates_post_schema(EditShopSchema)
     def put(self, post_data):
@@ -60,7 +60,7 @@ class Products(Resource):
         new_shop = Product(**post_data)
         new_shop.save_to_db()
 
-        return new_shop.as_dict(), 200
+        return new_shop.as_dict(), 201
 
     @validates_post_schema(EditProductSchema)
     def put(self, post_data):
