@@ -1,7 +1,7 @@
 import json
 import models
 from datetime import timedelta
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, or_
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, or_, Float
 from models import Base
 from utils import random_string, utcnow
 from models.deliveries import DeliveryStatus
@@ -41,6 +41,8 @@ class FoodieUser(BaseUser):
     role = Column(String)
     subscription = Column(String)
     photo_url = Column(String, nullable=True)
+    cash_balance = Column(Float)
+    favor_balance = Column(Float)
 
     def is_premium(self):
         return self.subscription == 'premium'
@@ -65,6 +67,8 @@ class FoodieUser(BaseUser):
             'surname': self.surname,
             'reputation': None,
         }
+        if self.photo_url is not None:
+            data['photo_url'] = self.photo_url
         return data
 
     def __repr__(self):  # pragma: no cover

@@ -1,7 +1,10 @@
 import os
+import re
 from googlemaps import Client
 
 GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
+
+REGEX = "^-?\d+\.\d+,-?\d+\.\d+$"
 
 GARCIA_CASTRO = "-34.5865603,-58.4474571"
 BUEN_LIBRO = "-34.600452,-58.372497"
@@ -34,3 +37,7 @@ def distance_between(origins: list, destination: str):
         return [_extract_row_data(row) for row in raw['rows']]
     except Exception as e:
         return None
+
+
+def is_coordinate(coordinate):
+    return True if re.match(REGEX, coordinate) else False

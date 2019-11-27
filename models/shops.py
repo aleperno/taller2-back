@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Boolean
 from models import Base, JSONEncodedValue
 from utils import utcnow
+from utils.maps import distance_between
 
 
 class FoodieShop(Base):
@@ -62,8 +63,9 @@ class Order(Base):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.status = 'pending'
-        self.distance = 445
         self.shop_location = FoodieShop.get_by_id(self.shop_id).location
+        dist = distance_between([self.shop_location], self.user_location)
+        self.distance = dist[0]['distance']
         self.order_metadata = {
             'creation_date': self.creation_date,
         }

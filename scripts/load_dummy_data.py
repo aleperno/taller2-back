@@ -71,7 +71,7 @@ def new_users(base_url):
         r = requests.post(url, json=data)
         assert r.status_code == 201
         _id = r.json().get('id')
-        DELIVERIES.append(r.json())
+        USUARIOS.append(r.json())
 
     for i in range(CANT_DELIVERIES):
         data = _random_user()
@@ -82,7 +82,7 @@ def new_users(base_url):
         r = requests.post(url, json=data)
         assert r.status_code == 201
         _id = r.json().get('id')
-        USUARIOS.append(r.json())
+        DELIVERIES.append(r.json())
 
 
 def new_shops(base_url):
