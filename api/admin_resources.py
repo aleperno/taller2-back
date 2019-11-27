@@ -2,6 +2,7 @@ from api.resources import api, app # noqa
 from api.admin.users import Users
 from api.admin.admins import Admins, NewAdmin, ChangePassword
 from api.admin.shops import Shops, Products, Orders
+from api.admin.pricing import Pricing
 from api.auth import AdminLogin
 from models.admins import FoodieAdmin
 
@@ -33,3 +34,6 @@ api.add_resource(Shops, "/api/admin/shops/<int:shop_id>")
 api.add_resource(Shops, "/api/admin/shops", endpoint='shopss')
 api.add_resource(Products, "/api/admin/products")
 api.add_resource(Orders, "/api/admin/orders")
+
+# Pricin Engine
+api.add_resource(Pricing, "/api/admin/pricing")
