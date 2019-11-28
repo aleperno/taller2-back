@@ -18,7 +18,9 @@ depends_on = None
 
 def upgrade():
     op.add_column('orders', sa.Column('status_id', sa.Integer))
+    op.add_column('orders', sa.Column('product_prices', sa.Float))
 
 
 def downgrade():
     op.drop_column('orders, status_id')
+    op.drop_column('orders, product_prices')

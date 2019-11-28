@@ -29,16 +29,22 @@ class OrderEndpoint(Resource):
         shop_location = order.shop_location
 
         available_deliveries = DeliveryStatus.get_all_available_distance(shop_location)
+        """
         for d in available_deliveries:
             distance = d['distance']
             price = PricingEngine.get_distance_price(distance)
             d['price'] = price
+        """
         closest_delivery = min(available_deliveries, key=lambda x: x['distance'])
+        price = PricingEngine.get_distance_price(order.distance)
+        order.price = price
+        order.save_to_db()
 
         data = {
             'order_id': order.id,
             'available': {x['user_id']: x for x in available_deliveries},
-            'closest': closest_delivery['user_id']
+            'closest': closest_delivery['user_id'],
+            'delivery_price': price,
         }
         return data, 200
 
@@ -46,6 +52,8 @@ class OrderEndpoint(Resource):
 class OrderStatus(Resource):
     def get(self, order_id):
         order = Order.get_by_id(order_id)
+        if not order:
+            return "Not found", 404
 
         if order.status_id <= 1:
             """
@@ -54,15 +62,19 @@ class OrderStatus(Resource):
             shop_location = order.shop_location
 
             available_deliveries = DeliveryStatus.get_all_available_distance(shop_location)
+            """
             for d in available_deliveries:
                 distance = d['distance']
                 price = PricingEngine.get_distance_price(distance)
                 d['price'] = price
+            """
             closest_delivery = min(available_deliveries, key=lambda x: x['distance'])
+
 
             data = {
                 'available': {x['user_id']: x for x in available_deliveries},
-                'closest': closest_delivery['user_id']
+                'closest': closest_delivery['user_id'],
+                'delivery_price': order.price
             }
 
             if order.status_id == 1:
@@ -103,7 +115,7 @@ class ChooseDelivery(Resource):
 class CancelOrder(Resource):
     @validates_post_schema(CancelOrderSchema)
     def post(self, order_id, post_data):
-        order_id = post_data.get('order_id')
+        #order_id = post_data.get('order_id')
         user_id = post_data.get('user_id')
 
         order = Order.get_by_id(order_id)

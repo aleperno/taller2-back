@@ -26,7 +26,7 @@ api.add_resource(OrderEndpoint, "/api/orders")
 
 # Flujo Ordenes
 api.add_resource(ChooseDelivery, "/api/orders/choose_delivery")
-api.add_resource(OrderStatus, "/api/orders/<int:order_id>")
+api.add_resource(OrderStatus, "/api/orders/<int:order_id>/status")
 api.add_resource(CancelOrder, "/api/orders/<int:order_id>/cancel")
 
 # Deliveries

@@ -63,6 +63,7 @@ class Order(Base):
     favor = Column(Boolean, default=False)
     products = Column(JSONEncodedValue)
     price = Column(Float)
+    product_prices = Column(Float)
     creation_date = Column(DateTime, default=utcnow)
     order_metadata = Column(JSONEncodedValue)
 
