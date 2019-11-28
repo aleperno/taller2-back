@@ -3,7 +3,7 @@ from marshmallow import (ValidationError,
                          )
 from models.users import FoodieUser
 from models.admins import FoodieAdmin
-from models.shops import FoodieShop, Product
+from models.shops import FoodieShop, Product, Order
 from utils.maps import is_coordinate
 
 
@@ -41,6 +41,11 @@ def shop_exists(shop_id):
 def product_exists(product_id):
     if not Product.get_by_id(product_id):
         raise ValidationError(f'Product id {product_id} doesnt exist')
+
+
+def order_exists(order_id):
+    if not Order.get_by_id(order_id):
+        raise ValidationError(f'Order id {order_id} doesnt exist')
 
 
 def product_belongs_shop(product_id, shop_id):

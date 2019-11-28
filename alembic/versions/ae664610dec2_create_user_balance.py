@@ -30,6 +30,5 @@ def upgrade():
 
 
 def downgrade():
-    #op.drop_column('foodie_user', 'cash_balance')
-    #op.drop_column('foodie_user', 'favor_balance')
-    pass
+    op.drop_column('foodie_user', 'cash_balance')
+    op.drop_column('foodie_user', 'favor_balance')

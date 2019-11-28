@@ -3,7 +3,7 @@ from flask_restful import Api
 from flask_cors import CORS
 from api.user import NewUser, User
 from api.auth import UserLogin, ForgotPassword, ResetPassword, FacebookLogin
-from api.shops import ShopProducts, Shops, OrderEndpoint
+from api.shops import ShopProducts, Shops, OrderEndpoint, ChooseDelivery, OrderStatus, CancelOrder
 from api.deliveries import DeliveryStatusResource, AvailableDeliveries
 
 app = Flask(__name__)
@@ -24,6 +24,10 @@ api.add_resource(Shops, "/api/shops", endpoint="user_shops")
 api.add_resource(ShopProducts, "/api/shops/<int:shop_id>/products")
 api.add_resource(OrderEndpoint, "/api/orders")
 
+# Flujo Ordenes
+api.add_resource(ChooseDelivery, "/api/orders/choose_delivery")
+api.add_resource(OrderStatus, "/api/orders/<int:order_id>")
+api.add_resource(CancelOrder, "/api/orders/<int:order_id>/cancel")
 
 # Deliveries
 api.add_resource(DeliveryStatusResource, "/api/deliveries/status")

@@ -4,7 +4,7 @@ from marshmallow import (
     validates_schema,
     ValidationError,
     )
-from api.validators import shop_exists, product_exists, product_belongs_shop, user_id_exists, valid_coordinate
+from api.validators import shop_exists, product_exists, product_belongs_shop, user_id_exists, valid_coordinate, order_exists
 
 
 class NewShopSchema(Schema):
@@ -64,3 +64,16 @@ class OrderSchema(Schema):
             if not product_belongs_shop(product_id, shop_id):
                 raise ValidationError(f'Product {product_id} does not belong to shop {shop_id}',
                                       field_name='products')
+
+
+class ChooseDeliverySchema(Schema):
+    user_id = fields.Int(required=True, validate=user_id_exists)
+    delivery_id = fields.Int(required=True, validate=user_id_exists)
+    order_id = fields.Int(required=True, validate=order_exists)
+
+
+class CancelOrderSchema(Schema):
+    user_id = fields.Int(required=True, validate=user_id_exists)
+    order_id = fields.Int(required=True, validate=order_exists)
+
+
