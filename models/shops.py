@@ -109,3 +109,10 @@ class Order(Base):
 
     def is_cancelled(self):
         return self.status_id == CANCELLED
+
+    @classmethod
+    def get_available_deliveries(cls, delivery_id):
+        return Order.query().filter(Order.delivery_id==delivery_id, Order.status_id==1).all()
+
+    def data_for_delivery(self):
+        return self.as_dict()

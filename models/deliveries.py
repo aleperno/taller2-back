@@ -62,7 +62,7 @@ class DeliveryStatus(Base):
         return available
 
     @classmethod
-    def get_all_available_distance(cls, shop_location):
+    def get_all_available_distance(cls, shop_location, deliveries_only=False):
         from models.users import FoodieUser
         """
         Obtengo todos los deliveries que se encuentan disponibles, junto con la distancia hacia la ubicación
@@ -81,6 +81,9 @@ class DeliveryStatus(Base):
                 distance = distance_data['distance']
                 d = delivery.as_dict()
                 user = FoodieUser.get_by_id(delivery.user_id)
+                if user.is_user() and deliveries_only:
+                    # El usuario no es delivery, y queremos sólo deliveries
+                    continue
                 d.update(user.public_info())
                 d['distance'] = distance
                 data.append(d)

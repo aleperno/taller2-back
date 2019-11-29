@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from models.shops import Product, FoodieShop, Order
+from models.users import FoodieUser
 from models.deliveries import DeliveryStatus
 from models.pricing import PricingEngine
 from api.schemas.shops import OrderSchema, ChooseDeliverySchema, CancelOrderSchema
@@ -28,14 +29,16 @@ class OrderEndpoint(Resource):
 
         shop_location = order.shop_location
 
-        available_deliveries = DeliveryStatus.get_all_available_distance(shop_location)
+        deliveries_only = not order.favor
+        available_deliveries = DeliveryStatus.get_all_available_distance(shop_location, deliveries_only=deliveries_only)
         """
         for d in available_deliveries:
             distance = d['distance']
             price = PricingEngine.get_distance_price(distance)
             d['price'] = price
         """
-        closest_delivery = min(available_deliveries, key=lambda x: x['distance'])
+        if available_deliveries:
+            closest_delivery = min(available_deliveries, key=lambda x: x['distance'])
         price = PricingEngine.get_distance_price(order.distance)
         order.price = price
         order.save_to_db()
@@ -43,7 +46,7 @@ class OrderEndpoint(Resource):
         data = {
             'order_id': order.id,
             'available': {x['user_id']: x for x in available_deliveries},
-            'closest': closest_delivery['user_id'],
+            'closest': closest_delivery['user_id'] if available_deliveries else None,
             'delivery_price': price,
         }
         return data, 200
@@ -61,19 +64,22 @@ class OrderStatus(Resource):
             """
             shop_location = order.shop_location
 
-            available_deliveries = DeliveryStatus.get_all_available_distance(shop_location)
+            deliveries_only = not order.favor
+
+            available_deliveries = DeliveryStatus.get_all_available_distance(shop_location, deliveries_only=deliveries_only)
             """
             for d in available_deliveries:
                 distance = d['distance']
                 price = PricingEngine.get_distance_price(distance)
                 d['price'] = price
             """
-            closest_delivery = min(available_deliveries, key=lambda x: x['distance'])
+            if available_deliveries:
+                closest_delivery = min(available_deliveries, key=lambda x: x['distance'])
 
 
             data = {
                 'available': {x['user_id']: x for x in available_deliveries},
-                'closest': closest_delivery['user_id'],
+                'closest': closest_delivery['user_id'] if available_deliveries else None,
                 'delivery_price': order.price
             }
 
@@ -128,3 +134,14 @@ class CancelOrder(Resource):
             order.save_to_db()
 
         return {'status': order.status, 'status_id': order.status_id}, 200
+
+
+class AvailableOrders(Resource):
+    """
+    Para que un delivery consulte que órdenes tiene disponible para aceptar
+    """
+    def get(self, user_id):
+        user = FoodieUser.get_by_id(user_id)
+
+        orders = Order.get_available_deliveries(user_id)
+        return [order.data_for_delivery() for order in orders], 200
