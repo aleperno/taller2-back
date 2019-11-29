@@ -96,6 +96,12 @@ class Order(Base):
         self.status_id = PENDING
         self.save_to_db()
 
+    def set_accepted_by_delivery(self):
+        self.status_id = DELIVERY_ACCEPTED
+        self.status = 'delivery_accepted'
+        self.update_metadata('delivery_accepted')
+        self.save_to_db()
+
     def can_cancel(self):
         """
         Solo se puede cancelar el pedido si el mismo se encuentra en `pending` o `waiting_delivery_acceptance`
@@ -117,7 +123,7 @@ class Order(Base):
     def data_for_delivery(self):
         from models.deliveries import DeliveryStatus
         from models.users import FoodieUser
-        keys = ['shop_location', 'user_location', 'shop_id', 'user_id', 'distance']
+        keys = ['id', 'shop_location', 'user_location', 'shop_id', 'user_id', 'distance']
 
         status = DeliveryStatus.get_by_id(self.delivery_id)
         distance = status.distance_to(self.shop_location)['distance']
@@ -128,3 +134,16 @@ class Order(Base):
         user = FoodieUser.get_by_id(self.user_id)
         data['user_data'] = user.public_info()
         return data
+
+    def get_delivery_status(self):
+        from models.deliveries import DeliveryStatus
+        from models.users import FoodieUser
+        status = DeliveryStatus.get_by_id(self.delivery_id)
+        user = FoodieUser.get_by_id(self.delivery_id)
+        location = status.location
+        return {
+            'status': self.status,
+            'status_id': self.status_id,
+            'delivery_location': location,
+            'delivery_data': user.public_info(),
+        }

@@ -77,3 +77,8 @@ class CancelOrderSchema(Schema):
     order_id = fields.Int(required=True, validate=order_exists)
 
 
+class AcceptOrderSchema(Schema):
+    order_id = fields.Int(required=True, validate=order_exists)
+    user_id = fields.Int(required=True, validate=user_id_exists)
+
+
