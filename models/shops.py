@@ -116,6 +116,7 @@ class Order(Base):
 
     def data_for_delivery(self):
         from models.deliveries import DeliveryStatus
+        from models.users import FoodieUser
         keys = ['shop_location', 'user_location', 'shop_id', 'user_id', 'distance']
 
         status = DeliveryStatus.get_by_id(self.delivery_id)
@@ -124,4 +125,6 @@ class Order(Base):
         data = {k:v for k,v in self.as_dict().items() if k in keys}
         data['distance_to_shop'] = distance
         data['total_distance'] = distance + self.distance
+        user = FoodieUser.get_by_id(self.user_id)
+        data['user_data'] = user.public_info()
         return data
