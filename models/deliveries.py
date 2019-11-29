@@ -50,10 +50,11 @@ class DeliveryStatus(Base):
         return not self.expired and self.available
 
     def distance_to(self, location):
-        """
-        TODO: Devolver distancia entre self.location y location
-        """
-        return random.randint(0, 2000)
+        dist = distance_between([self.location], location)[0]
+        if dist['status'] is False:
+            return False
+        else:
+            return dist
 
     @classmethod
     def get_all_available(cls):

@@ -115,4 +115,13 @@ class Order(Base):
         return Order.query().filter(Order.delivery_id==delivery_id, Order.status_id==1).all()
 
     def data_for_delivery(self):
-        return self.as_dict()
+        from models.deliveries import DeliveryStatus
+        keys = ['shop_location', 'user_location', 'shop_id', 'user_id', 'distance']
+
+        status = DeliveryStatus.get_by_id(self.delivery_id)
+        distance = status.distance_to(self.shop_location)['distance']
+
+        data = {k:v for k,v in self.as_dict().items() if k in keys}
+        data['distance_to_shop'] = distance
+        data['total_distance'] = distance + self.distance
+        return data
