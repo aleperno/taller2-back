@@ -33,6 +33,13 @@ class Shops(Resource):
 
         return shop.as_dict(), 200
 
+    def delete(self, shop_id):
+        shop = FoodieShop.get_by_id(shop_id)
+        shop.active = False
+        shop.save_to_db()
+        return shop.as_dict(), 200
+
+
 
 class Products(Resource):
     # TODO: Hacer esto bien, tomando los optional args
@@ -70,6 +77,12 @@ class Products(Resource):
             setattr(product, k, v)
         product.save_to_db()
 
+        return product.as_dict(), 200
+
+    def delete(self, product_id):
+        product = Product.get_by_id(product_id)
+        product.active = False
+        product.save_to_db()
         return product.as_dict(), 200
 
 

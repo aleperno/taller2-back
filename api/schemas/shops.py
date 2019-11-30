@@ -22,6 +22,7 @@ class EditShopSchema(Schema):
     address = fields.Str()
     location = fields.Str()
     category = fields.Str()
+    active = fields.Boolean()
 
 
 class NewProductSchema(Schema):
@@ -39,6 +40,7 @@ class EditProductSchema(Schema):
     description = fields.Str()
     category = fields.Str()
     price = fields.Float()
+    active = fields.Boolean()
 
 
 class ItemSchema(Schema):

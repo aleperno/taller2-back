@@ -32,7 +32,8 @@ api.add_resource(Users, "/api/admin/users/<int:user_id>")
 api.add_resource(Users, "/api/admin/users", endpoint='userss')
 api.add_resource(Shops, "/api/admin/shops/<int:shop_id>")
 api.add_resource(Shops, "/api/admin/shops", endpoint='shopss')
-api.add_resource(Products, "/api/admin/products")
+api.add_resource(Products, "/api/admin/products", endpoint='productss')
+api.add_resource(Products, "/api/admin/products/<int:product_id>")
 api.add_resource(Orders, "/api/admin/orders")
 
 # Pricin Engine

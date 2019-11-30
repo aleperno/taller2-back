@@ -41,6 +41,7 @@ class FoodieUser(BaseUser):
     role = Column(String)
     subscription = Column(String)
     photo_url = Column(String, nullable=True)
+    active = Column(Boolean, default=True)
 
     def is_premium(self):
         return self.subscription == 'premium'

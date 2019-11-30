@@ -13,6 +13,7 @@ class FoodieShop(Base):
     location = Column(String)
     category = Column(String)
     creation_date = Column(DateTime, default=utcnow)
+    active = Column(Boolean, default=True)
 
 
 class Product(Base):
@@ -25,6 +26,7 @@ class Product(Base):
     category = Column(String)
     price = Column(Float)
     creation_date = Column(DateTime, default=utcnow)
+    active = Column(Boolean, default=True)
 
     @classmethod
     def get_shop_products(cls, shop_id):
