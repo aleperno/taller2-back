@@ -1,7 +1,7 @@
 import json
 import models
 from datetime import timedelta
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, or_
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, or_, Float
 from models import Base
 from utils import random_string, utcnow
 from models.deliveries import DeliveryStatus
@@ -42,8 +42,8 @@ class FoodieUser(BaseUser):
     subscription = Column(String)
     photo_url = Column(String, nullable=True)
     active = Column(Boolean, default=True)
-    cash_balance = Column(Float)
-    favor_balance_balance = Column(Float)
+    cash_balance = Column(Float, default=0)
+    favor_balance = Column(Float, default=0)
 
     def is_premium(self):
         return self.subscription == 'premium'

@@ -23,6 +23,8 @@ def test_multiple_user(multiple_users, testing_app):
             'creation_date': '2019-09-28T13:48:00',
             'status': 'active',
             'active': True,
+            'favor_balance': 0,
+            'cash_balance': 0,
         },
         {
             'id': 2,
@@ -37,6 +39,8 @@ def test_multiple_user(multiple_users, testing_app):
             'creation_date': '2019-09-28T13:48:00',
             'status': 'active',
             'active': True,
+            'favor_balance': 0,
+            'cash_balance': 0,
         }
     ]
 
@@ -58,6 +62,8 @@ def test_single_user(multiple_users, testing_app):
         'creation_date': '2019-09-28T13:48:00',
         'status': 'active',
         'active': True,
+        'favor_balance': 0,
+        'cash_balance': 0,
     }
 
 
@@ -106,6 +112,8 @@ def test_new_user(db_session, testing_app):
         'creation_date': '2019-09-28T13:48:00',
         'status': 'active',
         'active': True,
+        'cash_balance': 0,
+        'favor_balance': 0,
     }
 
 
