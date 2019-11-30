@@ -25,14 +25,9 @@ class EditUserSchema(Schema):
     email = fields.Email(required=False)
     password = fields.Str(validate=password_validate, required=False)
     phone = fields.Str(required=False)
-    role = fields.Str(missing='user', validate=validate.OneOf(choices=['user', 'delivery']))
-    subscription = fields.Str(missing='flat', validate=validate.OneOf(choices=['flat', 'premium']))
+    role = fields.Str(validate=validate.OneOf(choices=['user', 'delivery']))
+    subscription = fields.Str(validate=validate.OneOf(choices=['flat', 'premium']))
     photo_url = fields.Url(required=False)
     active = fields.Boolean(required=False)
     cash_balance = fields.Float(required=False)
     favor_balance = fields.Float(required=False)
-
-    @validates_schema
-    def validate_photo(self, data, **kwargs):
-        if data.get('role') == 'delivery' and not data.get('photo_url'):
-            raise ValidationError("Delivery must upload photo", field_name='photo_url')
