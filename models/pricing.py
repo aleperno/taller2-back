@@ -34,3 +34,18 @@ class PricingRules(Base):
         else:
             rule.raw_data = data
             rule.save_to_db()
+
+
+class PricingEngine(object):
+
+    base = 20
+
+    @classmethod
+    def get_distance_price(cls, distance):
+        if distance < 2000:
+            return cls.base
+        else:
+            extra = distance - 2000
+            extra_price = 15 * (extra // 1000)
+            return cls.base + extra_price
+

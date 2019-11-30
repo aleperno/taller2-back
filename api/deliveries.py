@@ -35,6 +35,7 @@ class DeliveryStatusResource(Resource):
 class AvailableDeliveries(Resource):
     def get(self):
         available = DeliveryStatus.get_all_available()
+        available = [x.as_dict() for x in available]
         for delivery in available:
             user = FoodieUser.get_by_id(delivery.get('user_id'))
             delivery.update(user.public_info())

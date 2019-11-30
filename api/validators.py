@@ -3,7 +3,8 @@ from marshmallow import (ValidationError,
                          )
 from models.users import FoodieUser
 from models.admins import FoodieAdmin
-from models.shops import FoodieShop, Product
+from models.shops import FoodieShop, Product, Order
+from utils.maps import is_coordinate
 
 
 password_validate = validate.Length(min=6)
@@ -42,7 +43,18 @@ def product_exists(product_id):
         raise ValidationError(f'Product id {product_id} doesnt exist')
 
 
+def order_exists(order_id):
+    if not Order.get_by_id(order_id):
+        raise ValidationError(f'Order id {order_id} doesnt exist')
+
+
 def product_belongs_shop(product_id, shop_id):
     if not Product.product_belongs_shop(product_id, shop_id):
         raise ValidationError(f'Product id {product_id} does not belong to shop {shop_id}', field_name='products')
     return True
+
+
+def valid_coordinate(coord):
+    if not is_coordinate(coord):
+        raise ValidationError(f"Coordinate {coord} is not valid")
+

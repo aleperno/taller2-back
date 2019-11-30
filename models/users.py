@@ -45,6 +45,7 @@ class FoodieUser(BaseUser):
     cash_balance = Column(Float, default=0)
     favor_balance = Column(Float, default=0)
 
+
     def is_premium(self):
         return self.subscription == 'premium'
 
@@ -68,6 +69,8 @@ class FoodieUser(BaseUser):
             'surname': self.surname,
             'reputation': None,
         }
+        if self.photo_url is not None:
+            data['photo_url'] = self.photo_url
         return data
 
     def __repr__(self):  # pragma: no cover
