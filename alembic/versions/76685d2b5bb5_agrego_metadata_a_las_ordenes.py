@@ -1,7 +1,7 @@
 """Agrego metadata a las ordenes
 
 Revision ID: 76685d2b5bb5
-Revises: 129bdbf1bdc1
+Revises: c21af18add96
 Create Date: 2019-11-24 13:00:58.023989
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '76685d2b5bb5'
-down_revision = '129bdbf1bdc1'
+down_revision = 'c21af18add96'
 branch_labels = None
 depends_on = None
 

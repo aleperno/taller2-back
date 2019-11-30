@@ -1,7 +1,7 @@
 """Agrego Status id a las ordenes
 
 Revision ID: b2c55745a650
-Revises: ae664610dec2
+Revises: 76685d2b5bb5
 Create Date: 2019-11-28 00:58:42.536334
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'b2c55745a650'
-down_revision = 'ae664610dec2'
+down_revision = '76685d2b5bb5'
 branch_labels = None
 depends_on = None
 

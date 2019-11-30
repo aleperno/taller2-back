@@ -28,6 +28,9 @@ class EditUserSchema(Schema):
     role = fields.Str(missing='user', validate=validate.OneOf(choices=['user', 'delivery']))
     subscription = fields.Str(missing='flat', validate=validate.OneOf(choices=['flat', 'premium']))
     photo_url = fields.Url(required=False)
+    active = fields.Boolean(required=False)
+    cash_balance = fields.Float(required=False)
+    favor_balance = fields.Float(required=False)
 
     @validates_schema
     def validate_photo(self, data, **kwargs):

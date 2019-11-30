@@ -1,8 +1,8 @@
-"""Create user balance
+"""Creo balances de usuario
 
-Revision ID: ae664610dec2
-Revises: 76685d2b5bb5
-Create Date: 2019-11-27 16:29:19.879093
+Revision ID: c21af18add96
+Revises: 556dc8dd6fec
+Create Date: 2019-11-30 13:24:35.591737
 
 """
 from alembic import op
@@ -10,9 +10,10 @@ import sqlalchemy as sa
 from sqlalchemy.sql import table, column
 from sqlalchemy.types import Integer, Float
 
+
 # revision identifiers, used by Alembic.
-revision = 'ae664610dec2'
-down_revision = '76685d2b5bb5'
+revision = 'c21af18add96'
+down_revision = '556dc8dd6fec'
 branch_labels = None
 depends_on = None
 

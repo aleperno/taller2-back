@@ -40,3 +40,10 @@ class Users(Resource):
         user.save_to_db()
         return user.as_dict(), 200
 
+    def delete(self, user_id):
+        user = FoodieUser.get_by_id(user_id)
+        user.active = False
+        user.save_to_db()
+
+        return user.as_dict(), 200
+
