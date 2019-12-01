@@ -8,7 +8,18 @@ from copy import copy
 PENDING = 0
 WAITING_DELIVERY_ACCEPTANCE = 1
 DELIVERY_ACCEPTED = 2
+IN_SHOP = 3
+OUT_SHOP = 4
+DELIVERED = 5
+CONFIRMED = 6
 CANCELLED = 9
+
+STATUS_MAP = {
+    'accepted': 2,
+    'in_shop': 3,
+    'out_shop': 4,
+    'delivered': 5,
+}
 
 class FoodieShop(Base):
     __tablename__ = 'foodie_shop'
@@ -110,19 +121,29 @@ class Order(Base):
         self.status_id = PENDING
         self.save_to_db()
 
-    def set_accepted_by_delivery(self):
-        price = self.get_delivery_price()
-        self.delivery_revenue = price
-        self.status_id = DELIVERY_ACCEPTED
-        self.status = 'delivery_accepted'
-        self.update_metadata('delivery_accepted')
-        self.save_to_db()
+    def set_status(self, new_status):
+        new_status_id = STATUS_MAP[new_status]
+        if new_status_id not in (self.status_id, self.status_id + 1):
+            """
+            El cambio de estado se acepta cuando el status_id es el mismo (idempotente)
+            o un estado inmediatamente anterior. No se aceptan saltos de estado.
+            """
+            return False
+        else:
+            if new_status_id == DELIVERY_ACCEPTED:
+                price = self.get_delivery_price()
+                self.delivery_revenue = price
+            self.status_id = new_status_id
+            self.status = new_status
+            self.update_metadata(new_status)
+            self.save_to_db()
+            return True
 
     def can_cancel(self):
         """
         Solo se puede cancelar el pedido si el mismo se encuentra en `pending` o `waiting_delivery_acceptance`
         """
-        return self.status_id <= 1
+        return self.status_id <= WAITING_DELIVERY_ACCEPTANCE
 
     def cancel(self):
         self.status = 'cancelled'
@@ -167,3 +188,20 @@ class Order(Base):
 
     def get_delivery_price(self):
         return PricingEngine.get_delivery_revenue(self, self.delivery_id)
+
+    def confirm_delivery(self):
+        from models.users import FoodieUser
+        user = FoodieUser.get_by_id(self.user_id)
+        delivery = FoodieUser.get_by_id(self.delivery_id)
+
+        if self.favor:
+            user.update_favor_balance(-self.price)
+            delivery.update_favor_balance(self.delivery_revenue)
+        else:
+            user.update_cash_balance(-self.price)
+            delivery.update_cash_balance(self.delivery_revenue)
+
+        self.status_id = CONFIRMED
+        self.status = 'confirmed'
+        self.update_metadata('confirmed')
+        self.save_to_db()

@@ -1,6 +1,7 @@
 from marshmallow import (
     fields,
     Schema,
+    validate,
     validates_schema,
     ValidationError,
     )
@@ -79,8 +80,15 @@ class CancelOrderSchema(Schema):
     order_id = fields.Int(required=True, validate=order_exists)
 
 
-class AcceptOrderSchema(Schema):
+class UpdateOrderSchema(Schema):
     order_id = fields.Int(required=True, validate=order_exists)
-    user_id = fields.Int(required=True, validate=user_id_exists)
+    status = fields.String(required=True, validate=validate.OneOf(choices=['accepted',
+                                                                           'in_shop',
+                                                                           'out_shop',
+                                                                           'delivered',
+                                                                           ]))
 
+class ConfirmDeliverySchema(Schema):
+    user_id = fields.Int(required=True, validate=user_id_exists)
+    order_id = fields.Int(required=True, validate=order_exists)
 

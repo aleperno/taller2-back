@@ -3,7 +3,15 @@ from flask_restful import Api
 from flask_cors import CORS
 from api.user import NewUser, User
 from api.auth import UserLogin, ForgotPassword, ResetPassword, FacebookLogin
-from api.shops import ShopProducts, Shops, OrderEndpoint, ChooseDelivery, OrderStatus, CancelOrder, AvailableOrders, AcceptOrder
+from api.shops import (ShopProducts,
+                       Shops,
+                       OrderEndpoint,
+                       ChooseDelivery,
+                       OrderStatus,
+                       CancelOrder,
+                       AvailableOrders,
+                       ConfirmDelivery,
+                       )
 from api.deliveries import DeliveryStatusResource, AvailableDeliveries
 
 app = Flask(__name__)
@@ -30,7 +38,7 @@ api.add_resource(OrderStatus, "/api/orders/<int:order_id>/status")
 api.add_resource(CancelOrder, "/api/orders/<int:order_id>/cancel")
 
 api.add_resource(AvailableOrders, "/api/orders/available/<int:user_id>")
-api.add_resource(AcceptOrder, "/api/orders/accept")
+api.add_resource(ConfirmDelivery, "/api/orders/confirm")
 
 # Deliveries
 api.add_resource(DeliveryStatusResource, "/api/deliveries/status")

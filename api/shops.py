@@ -3,7 +3,7 @@ from models.shops import Product, FoodieShop, Order
 from models.users import FoodieUser
 from models.deliveries import DeliveryStatus
 from models.pricing import PricingEngine
-from api.schemas.shops import OrderSchema, ChooseDeliverySchema, CancelOrderSchema, AcceptOrderSchema
+from api.schemas.shops import OrderSchema, ChooseDeliverySchema, CancelOrderSchema, UpdateOrderSchema, ConfirmDeliverySchema
 from api.utils.__init__ import validates_post_schema
 
 
@@ -95,7 +95,7 @@ class OrderStatus(Resource):
                          'status': order.status})
 
             return data, 200
-        elif order.status_id == 2:
+        elif order.status_id >= 2 and order.status_id < 9:
             return order.get_delivery_status()
         elif order.is_cancelled():
             return {'status_id': order.status_id, 'status': order.status}, 200
@@ -150,19 +150,27 @@ class AvailableOrders(Resource):
         orders = Order.get_available_deliveries(user_id)
         return [order.data_for_delivery() for order in orders], 200
 
-
-class AcceptOrder(Resource):
-    @validates_post_schema(AcceptOrderSchema)
-    def post(self, post_data):
-        user_id = post_data.get('user_id')
+    @validates_post_schema(UpdateOrderSchema)
+    def put(self, user_id, post_data):
         order_id = post_data.get('order_id')
-
-        user = DeliveryStatus.get_by_id(user_id)
+        status = post_data.get('status')
         order = Order.get_by_id(order_id)
 
         if order.delivery_id != user_id:
             return False, 200
+
+        return order.set_status(status), 200
+
+
+class ConfirmDelivery(Resource):
+    @validates_post_schema(ConfirmDeliverySchema)
+    def post(self, post_data):
+        order_id = post_data.get('order_id')
+        user_id = post_data.get('user_id')
+        order = Order.get_by_id(order_id)
+
+        if order.user_id != user_id:
+            return [{'user_id': 'User does not own this order'}], 400
         else:
-            order.set_accepted_by_delivery()
-            user.set_busy()
-            return True, 200
+            order.confirm_delivery()
+            return 'Ok', 200

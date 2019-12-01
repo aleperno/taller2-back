@@ -63,6 +63,14 @@ class FoodieUser(BaseUser):
         else:
             return location.is_available
 
+    def update_favor_balance(self, val):
+        self.favor_balance += val
+        self.save_to_db()
+
+    def update_cash_balance(self, val):
+        self.cash_balance += val
+        self.save_to_db()
+
     def public_info(self):
         data = {
             'name': self.name,
