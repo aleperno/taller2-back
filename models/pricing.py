@@ -49,3 +49,7 @@ class PricingEngine(object):
             extra_price = 15 * (extra // 1000)
             return cls.base + extra_price
 
+    @classmethod
+    def get_delivery_revenue(cls, order, delivery):
+        return order.price * 0.85
+

@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Boolean
 from models import Base, JSONEncodedValue
+from models.pricing import PricingEngine
 from utils import utcnow
 from utils.maps import distance_between
 from copy import copy
@@ -68,6 +69,7 @@ class Order(Base):
     product_prices = Column(Float)
     creation_date = Column(DateTime, default=utcnow)
     order_metadata = Column(JSONEncodedValue)
+    delivery_revenue = Column(Float)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -79,6 +81,16 @@ class Order(Base):
         self.order_metadata = {
             'creation_date': utcnow().isoformat(),
         }
+        self.set_product_prices()
+
+    def set_product_prices(self):
+        sum = 0
+        for product in self.products:
+            count = product['quantity']
+            _id = product['id']
+            prod = Product.get_by_id(_id)
+            sum += (count * prod.price)
+        self.product_prices = sum
 
     def update_metadata(self, key):
         meta = copy(self.order_metadata)
@@ -99,6 +111,8 @@ class Order(Base):
         self.save_to_db()
 
     def set_accepted_by_delivery(self):
+        price = self.get_delivery_price()
+        self.delivery_revenue = price
         self.status_id = DELIVERY_ACCEPTED
         self.status = 'delivery_accepted'
         self.update_metadata('delivery_accepted')
@@ -125,7 +139,7 @@ class Order(Base):
     def data_for_delivery(self):
         from models.deliveries import DeliveryStatus
         from models.users import FoodieUser
-        keys = ['id', 'shop_location', 'user_location', 'shop_id', 'user_id', 'distance']
+        keys = ['id', 'shop_location', 'user_location', 'shop_id', 'user_id', 'distance', 'favor']
 
         status = DeliveryStatus.get_by_id(self.delivery_id)
         distance = status.distance_to(self.shop_location)['distance']
@@ -135,6 +149,7 @@ class Order(Base):
         data['total_distance'] = distance + self.distance
         user = FoodieUser.get_by_id(self.user_id)
         data['user_data'] = user.public_info()
+        data['revenue'] = self.get_delivery_price()
         return data
 
     def get_delivery_status(self):
@@ -149,3 +164,6 @@ class Order(Base):
             'delivery_location': location,
             'delivery_data': user.public_info(),
         }
+
+    def get_delivery_price(self):
+        return PricingEngine.get_delivery_revenue(self, self.delivery_id)

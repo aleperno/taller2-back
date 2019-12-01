@@ -48,6 +48,7 @@ class OrderEndpoint(Resource):
             'available': {x['user_id']: x for x in available_deliveries},
             'closest': closest_delivery['user_id'] if available_deliveries else None,
             'delivery_price': price,
+            'order_price': order.product_prices,
         }
         return data, 200
 
@@ -80,7 +81,8 @@ class OrderStatus(Resource):
             data = {
                 'available': {x['user_id']: x for x in available_deliveries},
                 'closest': closest_delivery['user_id'] if available_deliveries else None,
-                'delivery_price': order.price
+                'delivery_price': order.price,
+                'order_price': order.product_prices,
             }
 
             if order.status_id == 1:
