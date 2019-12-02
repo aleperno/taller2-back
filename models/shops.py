@@ -164,7 +164,7 @@ class Order(Base):
     def data_for_delivery(self):
         from models.deliveries import DeliveryStatus
         from models.users import FoodieUser
-        keys = ['id', 'shop_location', 'user_location', 'shop_id', 'user_id', 'distance', 'favor']
+        keys = ['id', 'shop_location', 'user_location', 'shop_id', 'user_id', 'distance', 'favor', 'products']
 
         status = DeliveryStatus.get_by_id(self.delivery_id)
         distance = status.distance_to(self.shop_location)['distance']
