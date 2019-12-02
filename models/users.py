@@ -220,3 +220,36 @@ class PasswordRecoveryToken(Base):
 
     def __repr__(self):  # pragma: no cover
         return f'Token for user {self.user_id}, expiration: {self.expiration}, used: {self.used}'
+
+
+class Reputation(Base):
+    __tablename__ = 'user_reputation'
+
+    user_id = Column(Integer, ForeignKey('foodie_user.id'), primary_key=True)
+    reputation_sum = Column(Float)
+    reputation_count = Column(Integer)
+
+    def __init__(self, user_id, review):
+        self.user_id = user_id
+        self.reputation_count = 1
+        self.reputation_sum = review
+
+    def add_review(self, review):
+        self.reputation_count += 1
+        self.reputation_sum += review
+
+    @property
+    def average(self):
+        return self.reputation_sum / self.reputation_count
+
+    @classmethod
+    def add_user_review(cls, user_id, review):
+        reputation = cls.get_by_id(user_id)
+        if not reputation:
+            reputation = Reputation(user_id, review)
+        else:
+            reputation.add_review(review)
+        reputation.save_to_db()
+
+    def __repr__(self):  # pragma: no cover
+        return f'User: {self.user_id}, reputation: {self.average:.2f}'

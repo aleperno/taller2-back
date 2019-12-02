@@ -205,3 +205,39 @@ class Order(Base):
         self.status = 'confirmed'
         self.update_metadata('confirmed')
         self.save_to_db()
+
+    def has_finished(self):
+        return self.status_id == CONFIRMED
+
+
+class OrderReview(Base):
+    __tablename__ = 'orders_review'
+
+    order_id = Column(Integer, ForeignKey('orders.id'), primary_key=True)
+    user_review = Column(Float)
+    delivery_review = Column(Float)
+
+    @classmethod
+    def new_review(cls, order_id, role, review):
+        order_review = cls.get_by_id(order_id)
+        key = f'{role}_review'
+
+        data = {
+            'order_id': order_id,
+            key: review
+        }
+        if not order_review:
+            order_review = cls(**data)
+        else:
+            setattr(order_review, key, review)
+        order_review.save_to_db()
+
+    @property
+    def order(self):
+        return Order.get_by_id(self.order_id)
+
+    def add_user_review(self, role, review):
+        self.new_review(self.order_id, role, review)
+
+    def get_role_review(self, role):
+        return getattr(self, f'{role}_review')

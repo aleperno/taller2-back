@@ -92,3 +92,9 @@ class ConfirmDeliverySchema(Schema):
     user_id = fields.Int(required=True, validate=user_id_exists)
     order_id = fields.Int(required=True, validate=order_exists)
 
+
+class OrderReviewSchema(Schema):
+    user_id = fields.Int(required=True, validate=user_id_exists)
+    order_id = fields.Int(required=True, validate=order_exists)
+    review = fields.Float(required=True)
+
