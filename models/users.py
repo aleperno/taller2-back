@@ -263,3 +263,19 @@ class Reputation(Base):
 
     def __repr__(self):  # pragma: no cover
         return f'User: {self.user_id}, reputation: {self.average:.2f}'
+
+
+class FirebaseToken(Base):
+    __tablename__ = 'firebase_token'
+
+    user_id = Column(Integer, ForeignKey('foodie_user.id'), primary_key=True)
+    token = Column(String)
+
+    @classmethod
+    def set_token(cls, user_id, token):
+        token_obj = cls.get_by_id(user_id)
+        if not token_obj:
+            token_obj = cls(user_id=user_id, token=token)
+        else:
+            token_obj.token = token
+        token_obj.save_to_db()

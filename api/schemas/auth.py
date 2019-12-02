@@ -10,6 +10,7 @@ from api.validators import email_exists, password_validate
 class LoginSchema(Schema):
     email = fields.Email(required=True)
     password = fields.Str(required=True)
+    firebase_token = fields.Str(required=False)
 
 
 class ForgottenPasswordSchema(Schema):
@@ -37,3 +38,4 @@ class RequiresAuthorization(Schema):
 
 class FacebookLoginSchema(Schema):
     fb_access_token = fields.Str(required=True)
+    firebase_token = fields.Str(required=False)

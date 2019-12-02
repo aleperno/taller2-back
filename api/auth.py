@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import request
-from models.users import FoodieUser, AuthToken, PasswordRecoveryToken
+from models.users import FoodieUser, AuthToken, PasswordRecoveryToken, FirebaseToken
 from models.admins import FoodieAdmin, AdminAuthToken
 from api.schemas.auth import (LoginSchema,
                               ForgottenPasswordSchema,
@@ -30,6 +30,9 @@ class UserLogin(Resource):
         elif not user.valid_password(password):
             return 'Wrong Password', 401
         else:
+            firebase_token = post_data.get('firebase_token')
+            if firebase_token:
+                FirebaseToken.set_token(user.id, firebase_token)
             token = self.token_cls.get_user_token(user.id)._as_dict()
             return token, 200, {'Authorization': token['token']}
 
@@ -53,6 +56,10 @@ class FacebookLogin(Resource):
         user = FoodieUser.get_by_email(email)
         if not user:
             return "Usuario inexistente", 404
+        
+        firebase_token = post_data.get('firebase_token')
+        if firebase_token:
+            FirebaseToken.set_token(user.id, firebase_token)
 
         return AuthToken.get_user_token(user.id)._as_dict(), 200
 
