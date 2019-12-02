@@ -1,9 +1,6 @@
 #Bla
 FROM python:3.7.0-alpine
 
-RUN apk update && \
-    apk add postgresql-dev gcc python3-dev musl-dev
-
 # set work directory
 WORKDIR /usr/src/app
 

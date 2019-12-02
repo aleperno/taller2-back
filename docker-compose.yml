@@ -1,14 +1,24 @@
 version: '3.5'
 
 services:
+  web:
+    build: .
+    command: gunicorn app:app -b 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 8000:8000
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://t2user:t2pass@db/t2db
+
   db:
     image: postgres:9.3-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=hello_flask
-      - POSTGRES_PASSWORD=hello_flask
-      - POSTGRES_DB=hello_flask_dev
+      - POSTGRES_USER=t2user
+      - POSTGRES_PASSWORD=t2pass
+      - POSTGRES_DB=t2db
     ports:
       - 5433:5432
 volumes:
