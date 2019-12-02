@@ -71,15 +71,25 @@ class FoodieUser(BaseUser):
         self.cash_balance += val
         self.save_to_db()
 
+    @property
+    def reputation(self):
+        rep = Reputation.get_by_id(self.id)
+        return rep.average if rep else None
+
     def public_info(self):
         data = {
             'name': self.name,
             'surname': self.surname,
-            'reputation': None,
+            'reputation': self.reputation,
         }
         if self.photo_url is not None:
             data['photo_url'] = self.photo_url
         return data
+
+    def as_dict(self):
+        d = super().as_dict()
+        d['reputation'] = self.reputation
+        return d
 
     def __repr__(self):  # pragma: no cover
         return f'Foodie User: id: {self.id}, name: {self.name}'

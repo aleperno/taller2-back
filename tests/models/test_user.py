@@ -17,6 +17,7 @@ def test_one_user(one_user, db_session):
                               'active': True,
                               'cash_balance': 0,
                               'favor_balance': 0,
+                              'reputation': None,
                               }
 
 

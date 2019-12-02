@@ -25,6 +25,7 @@ def test_multiple_user(multiple_users, testing_app):
             'active': True,
             'favor_balance': 0,
             'cash_balance': 0,
+            'reputation': None,
         },
         {
             'id': 2,
@@ -41,6 +42,7 @@ def test_multiple_user(multiple_users, testing_app):
             'active': True,
             'favor_balance': 0,
             'cash_balance': 0,
+            'reputation': None,
         }
     ]
 
@@ -64,6 +66,7 @@ def test_single_user(multiple_users, testing_app):
         'active': True,
         'favor_balance': 0,
         'cash_balance': 0,
+        'reputation': None,
     }
 
 
@@ -114,6 +117,7 @@ def test_new_user(db_session, testing_app):
         'active': True,
         'cash_balance': 0,
         'favor_balance': 0,
+        'reputation': None,
     }
 
 
