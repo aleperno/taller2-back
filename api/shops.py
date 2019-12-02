@@ -15,7 +15,8 @@ from api.utils.__init__ import validates_post_schema
 
 class Shops(Resource):
     def get(self):
-        return FoodieShop.get_all_dict()
+        all = [shop.as_dict() for shop in FoodieShop.get_all() if shop.has_products()]
+        return all
 
 
 class ShopProducts(Resource):

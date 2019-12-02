@@ -33,6 +33,10 @@ class FoodieShop(Base):
     creation_date = Column(DateTime, default=utcnow)
     active = Column(Boolean, default=True)
 
+    def has_products(self):
+        prods = Product.get_shop_products(self.id)
+        return False if not prods else True
+
 
 class Product(Base):
     __tablename__ = 'product'
