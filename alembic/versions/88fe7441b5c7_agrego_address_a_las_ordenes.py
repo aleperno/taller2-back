@@ -17,7 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('orders', 'address')
+    op.add_column('orders', sa.Column('address', sa.String))
 
 
 def downgrade():
