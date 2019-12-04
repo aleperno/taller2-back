@@ -85,6 +85,7 @@ class Order(Base):
     creation_date = Column(DateTime, default=utcnow)
     order_metadata = Column(JSONEncodedValue)
     delivery_revenue = Column(Float)
+    address = Column(String)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -164,7 +165,7 @@ class Order(Base):
     def data_for_delivery(self):
         from models.deliveries import DeliveryStatus
         from models.users import FoodieUser
-        keys = ['id', 'shop_location', 'user_location', 'shop_id', 'user_id', 'distance', 'favor', 'products']
+        keys = ['id', 'shop_location', 'user_location', 'shop_id', 'user_id', 'distance', 'favor', 'products', 'address']
 
         status = DeliveryStatus.get_by_id(self.delivery_id)
         distance = status.distance_to(self.shop_location)['distance']
