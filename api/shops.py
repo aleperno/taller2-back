@@ -93,7 +93,7 @@ class OrderStatus(Resource):
             }
 
             if order.status_id == 1:
-                if order.delivery_id in data['available']:
+                if any(deli['user_id'] == order.delivery_id for deli in data['available']):
                     data['chosen'] = order.delivery_id
                 else:
                     order.set_pending()
@@ -165,6 +165,11 @@ class AvailableOrders(Resource):
 
         if order.delivery_id != user_id:
             return False, 200
+
+        if status == "accepted":
+            deli = DeliveryStatus.get_by_id(user_id)
+            deli.set_busy()
+            deli.save_to_db()
 
         return order.set_status(status), 200
 
