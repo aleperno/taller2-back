@@ -88,4 +88,13 @@ class Products(Resource):
 
 class Orders(Resource):
     def get(self):
-        return Order.get_all_dict(), 200
+        orders = Order.get_all()
+        data = []
+        for order in orders:
+            d = order.as_dict()
+            if order.is_accepted():
+                delivery_data = order.get_delivery_status()
+                d['delivery_location'] = delivery_data['delivery_location']
+            data.append(d)
+
+        return data, 200

@@ -213,6 +213,9 @@ class Order(Base):
     def has_finished(self):
         return self.status_id == CONFIRMED
 
+    def is_accepted(self):
+        return self.status_id >= DELIVERY_ACCEPTED and self.status_id != CANCELLED
+
 
 class OrderReview(Base):
     __tablename__ = 'orders_review'
