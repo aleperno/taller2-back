@@ -38,16 +38,22 @@ class PricingRules(Base):
 
 class PricingEngine(object):
 
-    base = 20
+    flat_base = 20
+    premium_base = 10
+
+    flat_extra = 15
+    premium_extra = 12
 
     @classmethod
-    def get_distance_price(cls, distance):
+    def get_distance_price(cls, distance, user):
+        base = getattr(cls, f"{user.subscription}_base")
         if distance < 2000:
-            return cls.base
+            return base
         else:
+            extra_mult = getattr(cls, f"{user.subscription}_extra")
             extra = distance - 2000
-            extra_price = 15 * (extra // 1000)
-            return cls.base + extra_price
+            extra_price = extra_mult * (extra // 1000)
+            return base + extra_price
 
     @classmethod
     def get_delivery_revenue(cls, order, delivery):

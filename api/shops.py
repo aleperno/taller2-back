@@ -46,7 +46,8 @@ class OrderEndpoint(Resource):
         """
         if available_deliveries:
             closest_delivery = min(available_deliveries, key=lambda x: x['distance'])
-        price = PricingEngine.get_distance_price(order.distance)
+        user = FoodieUser.get_by_id(order.user_id)
+        price = PricingEngine.get_distance_price(order.distance, user)
         order.price = price
         order.save_to_db()
 
