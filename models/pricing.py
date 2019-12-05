@@ -49,6 +49,15 @@ class PricingRules(Base):
         if cls.get_current_rule() is None:
             cls.update_rule(cls.default_rule)
 
+
+    @classmethod
+    def get_current_rule_dict(cls):
+        current = cls.get_current_rule()
+        if not current:
+            return cls.default_rule
+        return current
+    
+
     def get_rules_dict(self):
         return self.raw_data
 
@@ -63,7 +72,7 @@ class PricingEngine(object):
 
     @classmethod
     def get_distance_price(cls, distance, user):
-        rules = PricingRules.get_current_rule().get_rules_dict()
+        rules = PricingRules.get_current_rule_dict()
         prefix = user.subscription
 
         base = rules[f'{prefix}_base']
@@ -77,6 +86,6 @@ class PricingEngine(object):
 
     @classmethod
     def get_delivery_revenue(cls, order, delivery):
-        rules = PricingRules.get_current_rule().get_rules_dict()
+        rules = PricingRules.get_current_rule_dict()
         return order.price * (rules['delivery_revenue_perc'] / 100)
 
