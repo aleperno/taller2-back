@@ -29,6 +29,8 @@ def _extract_row_data(row):
 
 
 def distance_between(origins: list, destination: str):
+    if not origins or not destination:
+        return None
     client = Client(key=GOOGLE_API_KEY)
     try:
         destinations = [destination]
