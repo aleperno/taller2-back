@@ -2,13 +2,13 @@ import os
 import logging
 from models import Base, engine
 from api.admin_resources import app, check_admin_status
-from models.pricing import PricingRules
+#from models.pricing import PricingRules
 
 
 Base.metadata.create_all(engine)
 check_admin_status()
 
-PricingRules.check_initial_status()
+#PricingRules.check_initial_status()
 
 LOGLEVEL = os.environ.get('LOGLEVEL')
 
