@@ -31,3 +31,13 @@ class EditUserSchema(Schema):
     active = fields.Boolean(required=False)
     cash_balance = fields.Float(required=False)
     favor_balance = fields.Float(required=False)
+
+
+class PricingSchema(Schema):
+    flat_min_km = fields.Integer(required=True)
+    flat_base = fields.Integer(required=True)
+    flat_extra_km = fields.Integer(required=True)
+    premium_min_km = fields.Integer(required=True)
+    premium_base = fields.Integer(required=True)
+    premium_extra_km = fields.Integer(required=True)
+    delivery_revenue_perc = fields.Integer(required=True)

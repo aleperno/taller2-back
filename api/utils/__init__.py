@@ -10,7 +10,7 @@ def validates_post_schema(schema):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            from utils.logging import MyLogger
+            from utils.custom_logging import MyLogger
             try:
                 json_data = request.get_json(force=True)
                 MyLogger.debug("Se manda a %s, el JSON: %r", schema.__name__, json_data)

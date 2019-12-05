@@ -12,7 +12,7 @@ import models
 class NewUser(Resource):
     @validates_post_schema(NewUserSchema)
     def post(self, post_data):
-        from utils.logging import MyLogger # Import circular
+        from utils.custom_logging import MyLogger # Import circular
         email = post_data['email']
 
         new_user = FoodieUser(**post_data)

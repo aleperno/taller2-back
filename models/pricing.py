@@ -4,13 +4,22 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, d
 from models import Base, JSONEncodedValue
 from utils import random_string, utcnow
 
-
 class PricingRules(Base):
     __tablename__ = 'pricing_rule'
 
     id = Column(Integer, primary_key=True)
     raw_data = Column(JSONEncodedValue)
     last_updated = Column(DateTime, default=utcnow)
+
+    default_rule = {
+        'flat_min_km': 2,
+        'flat_base': 20,
+        'flat_extra_km': 15,
+        'premium_min_km': 3,
+        'premium_base': 20,
+        'premium_extra_km': 12,
+        'delivery_revenue_perc': 85
+    }
 
     def __init__(self, data, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,6 +44,14 @@ class PricingRules(Base):
             rule.raw_data = data
             rule.save_to_db()
 
+    @classmethod
+    def check_initial_status(cls):
+        if cls.get_current_rule() is None:
+            cls.update_rule(cls.default_rule)
+
+    def get_rules_dict(self):
+        return self.raw_data
+
 
 class PricingEngine(object):
 
@@ -46,16 +63,20 @@ class PricingEngine(object):
 
     @classmethod
     def get_distance_price(cls, distance, user):
-        base = getattr(cls, f"{user.subscription}_base")
-        if distance < 2000:
+        rules = PricingRules.get_current_rule().get_rules_dict()
+        prefix = user.subscription
+
+        base = rules[f'{prefix}_base']
+        if distance < (3 * rules[f'{prefix}_min_km']):
             return base
         else:
-            extra_mult = getattr(cls, f"{user.subscription}_extra")
-            extra = distance - 2000
-            extra_price = extra_mult * (extra // 1000)
+            extra_mult = rules[f'{prefix}_extra_km']
+            extra_km = (distance - 2000) // 1000
+            extra_price = extra_mult * extra_km
             return base + extra_price
 
     @classmethod
     def get_delivery_revenue(cls, order, delivery):
-        return order.price * 0.85
+        rules = PricingRules.get_current_rule().get_rules_dict()
+        return order.price * (rules['delivery_revenue_perc'] / 100)
 

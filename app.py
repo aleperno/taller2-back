@@ -16,7 +16,7 @@ LOGLEVEL = os.environ.get('LOGLEVEL')
 @app.before_first_request
 def setup_logging():
     # Borro los handlers iniciales
-    app.logger.removeHandler(app.logger.handlers[0])
+    #app.logger.removeHandler(app.logger.handlers[0])
     # Agrego handler re gunicorn
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers.extend(gunicorn_logger.handlers)

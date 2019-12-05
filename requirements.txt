@@ -10,3 +10,4 @@ facebook-sdk
 flask-cors
 names
 googlemaps
+firebase-admin

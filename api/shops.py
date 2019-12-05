@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from models.shops import Product, FoodieShop, Order, OrderReview
-from models.users import FoodieUser, Reputation
+from models.users import FoodieUser, Reputation, FirebaseToken
 from models.deliveries import DeliveryStatus
 from models.pricing import PricingEngine
 from api.schemas.shops import (OrderSchema,
@@ -9,8 +9,10 @@ from api.schemas.shops import (OrderSchema,
                                UpdateOrderSchema,
                                ConfirmDeliverySchema,
                                OrderReviewSchema,
+                               OrderMessageSchema,
                                )
 from api.utils.__init__ import validates_post_schema
+from utils.messaging import send_message_to
 
 
 class Shops(Resource):
@@ -230,3 +232,38 @@ class OrderReviewEndpoint(Resource):
                 order_review.add_user_review(review_role, review)
                 Reputation.add_user_review(user_id=other_user_id, review=review)
         return 'Ok', 200
+
+
+class OrderMessage(Resource):
+
+    @validates_post_schema(OrderMessageSchema)
+    def post(self, post_data):
+        from utils.custom_logging import MyLogger
+
+        user_id = post_data.get('user_id')
+        order_id = post_data.get('order_id')
+        message = post_data.get('message')
+
+        order = Order.get_by_id(order_id)
+
+        if order.status_id < 2:
+            return "Falta que acepte el delivery", 200
+
+        other_user_id = order.delivery_id if user_id == order.user_id else order.user_id
+
+        MyLogger.debug(f"EL usuario {user_id} le manda un mensaje al usuario {other_user_id} por la orden {order.id}, mensaje: {message} ")
+
+        destiny_token = FirebaseToken.get_user_token(other_user_id)
+
+        if not destiny_token:
+            return "Token not available", 200
+
+        data = {
+            'order_id': order.id,
+            'user_id': user_id,
+            'message': message,
+        }
+
+        resp = send_message_to(destiny_token, "Nuevo Mensaje", message, data=data)
+
+        return resp, 200

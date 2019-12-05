@@ -4,7 +4,7 @@ from api.utils import validates_post_schema
 from api.schemas.admins import EditUserSchema
 from api.validators import email_not_existing
 from marshmallow import ValidationError
-from utils.logging import MyLogger
+from utils.custom_logging import MyLogger
 import models
 
 

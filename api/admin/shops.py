@@ -3,7 +3,7 @@ from flask import request
 from api.utils.__init__ import validates_post_schema
 from api.schemas.shops import NewShopSchema, EditShopSchema, NewProductSchema, EditProductSchema
 from models.shops import FoodieShop, Product, Order
-from utils.logging import MyLogger
+from utils.custom_logging import MyLogger
 
 
 class Shops(Resource):

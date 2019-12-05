@@ -99,3 +99,10 @@ class OrderReviewSchema(Schema):
     order_id = fields.Int(required=True, validate=order_exists)
     review = fields.Float(required=True)
 
+
+class OrderMessageSchema(Schema):
+    user_id = fields.Int(required=True, validate=user_id_exists)
+    order_id = fields.Int(required=True, validate=order_exists)
+    message = fields.Str(required=True)
+    token = fields.Str(required=False)
+

@@ -12,6 +12,7 @@ from api.shops import (ShopProducts,
                        AvailableOrders,
                        ConfirmDelivery,
                        OrderReviewEndpoint,
+                       OrderMessage,
                        )
 from api.deliveries import DeliveryStatusResource, AvailableDeliveries
 
@@ -42,6 +43,8 @@ api.add_resource(AvailableOrders, "/api/orders/available/<int:user_id>")
 api.add_resource(ConfirmDelivery, "/api/orders/confirm")
 
 api.add_resource(OrderReviewEndpoint, "/api/orders/review")
+
+api.add_resource(OrderMessage, "/api/orders/message")
 
 # Deliveries
 api.add_resource(DeliveryStatusResource, "/api/deliveries/status")

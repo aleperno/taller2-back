@@ -279,3 +279,11 @@ class FirebaseToken(Base):
         else:
             token_obj.token = token
         token_obj.save_to_db()
+
+    @classmethod
+    def get_user_token(cls, user_id):
+        token_obk = cls.get_by_id(user_id)
+        if not token_obk:
+            return None
+        else:
+            return token_obk.token
