@@ -29,6 +29,8 @@ class UserLogin(Resource):
             return 'User not found', 404
         elif not user.valid_password(password):
             return 'Wrong Password', 401
+        elif not user.active:
+            return 'User was disabled', 404
         else:
             firebase_token = post_data.get('firebase_token')
             if firebase_token:

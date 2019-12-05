@@ -17,14 +17,14 @@ from utils.messaging import send_message_to
 
 class Shops(Resource):
     def get(self):
-        all = [shop.as_dict() for shop in FoodieShop.get_all() if shop.has_products()]
+        all = [shop.as_dict() for shop in FoodieShop.get_all() if (shop.has_products() and shop.active)]
         return all
 
 
 class ShopProducts(Resource):
     def get(self, shop_id):
         prods = Product.get_shop_products(shop_id)
-        return [p.as_dict() for p in prods], 200
+        return [p.as_dict() for p in prods if p.active], 200
 
 
 class OrderEndpoint(Resource):
