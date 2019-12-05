@@ -55,8 +55,8 @@ class PricingRules(Base):
         current = cls.get_current_rule()
         if not current:
             return cls.default_rule
-        return current
-    
+        return current.raw_data
+
 
     def get_rules_dict(self):
         return self.raw_data
