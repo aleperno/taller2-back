@@ -10,9 +10,13 @@ def validates_post_schema(schema):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            from utils.logging import MyLogger
             try:
-                post_data = schema().load(request.get_json(force=True))
+                json_data = request.get_json(force=True)
+                MyLogger.debug("Se manda a %s, el JSON: %r", schema.__name__, json_data)
+                post_data = schema().load(json_data)
             except ValidationError as e:
+                MyLogger.warning("Validation Error en %s, error: %r", schema.__name__, e.messages)
                 return e.messages, 400
             return func(*args, post_data=post_data, **kwargs)
 

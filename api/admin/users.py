@@ -4,6 +4,7 @@ from api.utils import validates_post_schema
 from api.schemas.admins import EditUserSchema
 from api.validators import email_not_existing
 from marshmallow import ValidationError
+from utils.logging import MyLogger
 import models
 
 
@@ -41,6 +42,7 @@ class Users(Resource):
         return user.as_dict(), 200
 
     def delete(self, user_id):
+        MyLogger.info("Se inhabilitó al user %d", user_id)
         user = FoodieUser.get_by_id(user_id)
         user.active = False
         user.save_to_db()

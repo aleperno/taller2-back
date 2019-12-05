@@ -3,14 +3,17 @@ from flask import request
 from api.utils.__init__ import validates_post_schema
 from api.schemas.shops import NewShopSchema, EditShopSchema, NewProductSchema, EditProductSchema
 from models.shops import FoodieShop, Product, Order
+from utils.logging import MyLogger
 
 
 class Shops(Resource):
     def get(self, shop_id=None):
         if shop_id is None:
+            MyLogger.info("Admin pide todos los shops")
             r = FoodieShop.query().all()
             return [e.as_dict() for e in r], 200
         else:
+            MyLogger.info("Admin pide por el shop %d", shop_id)
             r = FoodieShop.query().get(shop_id)
             if r is not None:
                 return r.as_dict(), 200
@@ -34,6 +37,7 @@ class Shops(Resource):
         return shop.as_dict(), 200
 
     def delete(self, shop_id):
+        MyLogger.info("Se inhabilitó el shop %d", shop_id)
         shop = FoodieShop.get_by_id(shop_id)
         shop.active = False
         shop.save_to_db()
@@ -80,6 +84,7 @@ class Products(Resource):
         return product.as_dict(), 200
 
     def delete(self, product_id):
+        MyLogger.info("Se inhabilitó el producto %d", product_id)
         product = Product.get_by_id(product_id)
         product.active = False
         product.save_to_db()
@@ -88,6 +93,7 @@ class Products(Resource):
 
 class Orders(Resource):
     def get(self):
+        MyLogger.info("Admin pide datos de las órdenes")
         orders = Order.get_all()
         data = []
         for order in orders:
