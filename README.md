@@ -52,6 +52,17 @@ El enunciado puede encontrarse acá [FOODIE](https://github.com/taller-de-progra
   El entorno de docker se contempla sólo para la ejecución del entorno productivo. No así para correr los tests.
   - docker-compose build
   - docker-compose up
+
+
+### Servicios
+El servidor usa diversos servicios de terceros, para poder utilizarlos se deben definir varias variables de entorno
+
+- SENDGRID_API_KEY: Se utiliza para el servicio de emails, necesario para recuperar una cuenta
+- GOOGLE_API_KEY: Necesaria para los servicios de maps.
+- FIREBASE_AUTH: Necesaria para el envio de notificaciones y mensajes a los usuarios.
+
+En `docker-compose.yml` posee las variables declaradas, pero el valor debe ser reemplazado por los correspondientes
+
 ---
 
 ## Tests  
@@ -74,6 +85,69 @@ o en su defecto
 Esto localmente iniciará un servidor escuchando en 
 
 `http://localhost:8000`
+
+---
+## Logging
+
+Se puede modificar el nivel de logging de la aplicación mediante una variable de entorno `LOGLEVEL`, por ejemplo (case-sensitive)
+ - LOGLEVEL=INFO
+ - LOGLEVEL=DEBUG
+ - LOGLEVEL=WARNING
+ - LOGLEVEL=ERROR
+
+---
+## Datos de Prueba
+
+Si se corre la aplicación por primera vez, existe la forma de cargar datos de prueba.
+
+Con la aplicación corriendo:
+    ```
+    python scripts/load_dummy_data.py [-t target]
+    ```
+donde `target` es opcional y es la ubicación de la aplicación, si no se especifíca apunta a `localhost:8000`
+
+---
+# Arquitectura
+
+## Deploy
+
+Actualmente la aplicación se encuentra con un esquema de `continous-delivery`. Cada vez que se pushea a `master` ocurre el siguiente flujo.
+
+    Tests => Coverage => Heroku
+
+Todos los tests reportan el cóverage a [coveralls](https://coveralls.io/github/aleperno/taller2-back).
+Si el test es exitoso, se *triggerea* un build de Heroku.
+
+Todo este proceso es automático, lo que nos permite fácilmente
+ - Identificar Pull Requests que no cumplan los requisitos para mergearse (tests fallidos / coverage)
+ - Identificar fallas rápidamente
+ - Poder tener la nueva versión corriendo sin intervención
+
+
+## Estructura Interna
+
+La estructura de la aplicación es relativamente sencilla y detallaremos los elementos principales.
+
+ - **Modelos**: Estos definen cómo se guarda la información en la base de datos. Utilizamos un ORM, que nos permite interactuar con la base mediante objetos.
+
+
+ - **Recursos**: Estos representan los recursos (endpoints) que brinda la aplicación.
+
+### Modelo
+El modelo general cuenta con pocas entidades
+ - **Usuario**: Representa a un usuario, ya sea del tipo común o delivery.
+ - **Shop**: Representa un comercio
+ - **Producto**: Representa los productos que poseen los shops.
+ - **Ordenes**: Representan los pedidos que realizan los usuarios.
+
+ Un usuario se relaciona con otro usuario **SÓLO** a través de una orden.
+
+Existen entidades adicionales que son auxiliares al modelo de negocio / estructura. Ejemplo
+
+ - **Tokens**: Representan los tokens de autorización
+ - **Reviews**: Representan los reviews hechos por una orden
+ - **Delivery Location**: Representa el estado (ubicación) de un delivery
+
 
 ---
 
