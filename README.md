@@ -430,8 +430,502 @@ Obtiene la informacion de todas las órdenes en el sistema. Ejemplo:
 
 ---
 
-### Usuarios
+## Usuarios
 
- * [Listar todos los usuarios](documentation/users.md#users): `GET /api/users`
- * [Listar un usuario](documentation/users.md#user): `GET /api/user/<id>`
- * [Crear Usuario](documentation/users.md#new-user): `POST /api/new_user`
+A continuacion se detallaran los endpoints para los usuarios
+
+## Registro / Autenticación
+
+### Nuevo Usuario
+
+**URL**: `/api/user`
+**METHODS**: POST
+Ejemplo:
+
+```json
+    {
+        'name': name,
+        'surname': surname,
+        'email': email,
+        'password': 'insecure', # min 6 chars
+        'phone': '4444-5555',
+        'role': 'user' or 'delivery' # opcional, defaults to user,
+        'subscription': 'flat' or 'premium' # optional, defaults to flat,
+        'photo_ur': # Si el usuario es delivery, debe especificar una imagen.
+    }
+```
+
+---
+
+### Login
+**URL**: `/api/login`
+**METHODS**: POST
+```json
+{
+    "email": ,
+    "password:,
+}
+```
+Devuelve `{'Authorization': <token>}`
+
+---
+
+### Facebook Login
+**URL**: `/api/fb_login`
+**METHODS**: POST
+```json
+{
+    "fb_access_token": <token>
+}
+```
+Devuelve `{'Authorization': <token>}`
+
+---
+
+### Contraseña Olvidada
+**URL**: `/api/forgot_password`
+**METHODS**: POST
+```json
+    "email":,
+```
+Se le envia a dicho mail un token para recuperar su contraseñá
+
+---
+
+### Recuperar Contraseña
+**URL**: `/api/reset_password`
+**METHODS**: POST
+```json
+    "email": ,
+    "password": ,
+    "confirm_password": ,
+    "token": ,
+```
+
+El servidor valida que el token sea válido (no expirado) y no haya sido usado con anterioridad. Asímismo valida que ambos campos de la contraseña cumplan los requerimientos (6 caracteres) y coincidan entre sí.
+
+---
+
+### Informacion del usuario
+**URL**: `/api/user`
+**METHODS**: GET
+**HEADERS**: Authorization
+
+Devuelve la información del usuario como diccionario. Se requiere que esté seteado el header de `Authorization` con el token obtenido en el login.
+
+```json
+{
+    "id": 9,
+    "name": "Alejandro",
+    "surname": "Pernin",
+    "email": "ale.pernin@gmail.com",
+    "password": "insecure",
+    "creation_date": "2019-11-02T20:39:57",
+    "status": "active",
+    "phone": "222222222",
+    "role": "delivery",
+    "subscription": "flat",
+    "photo_url": "http://asd.com",
+    "active": true,
+    "cash_balance": 0.0,
+    "favor_balance": 0.0,
+    "reputation": null
+}
+```
+---
+
+## Flujo de pedido
+
+### Ver Comercios
+
+Devuelve todos los comercios activos y que posean productos
+
+**URL**: `/api/shops`
+**METHODS**: GET
+
+```json
+[
+    {
+        "id": 2,
+        "name": "Confiteria Murano",
+        "description": "Tes y masitas para morirse",
+        "address": "Belgrano",
+        "location": "-34.5627322,-58.4564323",
+        "category": "facturas",
+        "creation_date": "2019-12-01T14:35:59",
+        "active": true
+    },...
+]
+```
+
+### Ver productos comercio
+
+Devuelve los productos activos de un comercio
+
+**URL**: `/api/shops/<shop_id>/products
+**METHODS**: GET
+```json
+[
+    {
+        "id": 3,
+        "shop_id": 2,
+        "name": "Te Negro",
+        "description": "Te negro, como el alma de la misma murano",
+        "category": "infusiones",
+        "price": 2.99,
+        "creation_date": "2019-12-01T14:36:03",
+        "active": true
+    },
+    {
+        "id": 4,
+        "shop_id": 2,
+        "name": "Masitas Finas",
+        "description": "Masitas Finas con un ingrediente secreto, hecho por la mismisima yiya.",
+        "category": "dulces",
+        "price": 5.0,
+        "creation_date": "2019-12-01T14:36:03",
+        "active": true
+    }
+]
+```
+
+### Efectuar Orden
+
+**URL**: `/api/orders`
+**METHODS**: POST
+```json
+{
+	"user_id": 1,
+	"shop_id": 1,
+	"user_location": "-34.572259,-58.4843497",
+	"products": [
+        {"id": 1, "quantity": 1}, ...
+        ],
+	"favor": false
+}
+```
+
+El servidor responde con
+
+```json
+{
+    "order_id": # El id de la orden
+    "available": [
+        # Un listado de deliveries disponibles, de haber
+    ],
+    "closest": , # El ID del delivery mas cercano, de haber
+    "delivery_price":, # El costo del delivery
+    "order_price": # El costo de los productos
+} 
+```
+
+ejemplo
+
+```json
+{
+    "order_id": 477,
+    "available": [
+        {
+            "user_id": 9,
+            "location": "-34.5604742,-58.4606362",
+            "available": true,
+            "last_updated": "2019-12-07T02:53:41",
+            "name": "Alejandro",
+            "surname": "Pernin",
+            "reputation": null,
+            "photo_url": "http://asd.com",
+            "distance": 2621
+        },
+        {
+            "user_id": 11,
+            "location": "-34.6122683,-58.3917467",
+            "available": true,
+            "last_updated": "2019-12-07T02:36:33",
+            "name": "Bart",
+            "surname": "Simpson",
+            "reputation": null,
+            "photo_url": "http://asd.com",
+            "distance": 7946
+        },
+        {
+            "user_id": 13,
+            "location": "-34.7643059,-58.2025602",
+            "available": true,
+            "last_updated": "2019-12-07T03:08:04",
+            "name": "Lisa",
+            "surname": "Simpson",
+            "reputation": null,
+            "photo_url": "http://asd.com",
+            "distance": 40602
+        }
+    ],
+    "closest": 9,
+    "delivery_price": 56,
+    "order_price": 300.0
+}
+```
+
+---
+
+### Elegir Delivery
+
+El usuario debe elegir el delivery para la orden
+
+**URL**: `/api/orders/choose_delivery`
+**METHODS**: POST
+
+```json
+    "user_id": # El id del él,
+    "order_id": # El id de la orden,
+    "delivery_id": #El id del delivery seleccionado
+```
+
+**Repuestas**: Hay dos opciones
+ - El delivery que se quiso seleccionar ya no se encuentra disponible
+ ```json
+    "status": "Choose another",
+    "status_id": 0,
+ ```
+ - El delivery seleccionado está disponible y está pendiente que acepte el pedido
+ ```json
+    "status": "Waiting delivery acceptance",
+    "status_id": 1,
+ ```
+
+ En ambos casos se devuelve `200` como status code.
+
+---
+
+### Consultar estado de la orden
+
+**URL**: `/api/orders/<order_id>/status`
+**METHODS**: GET,
+
+La respuesta varía acorde el estado de la orden
+- La orden no posee delivery elegido
+```json
+{
+    "order_id": 477,
+    "available": [
+       ...
+    ],
+    "closest": 9,
+    "delivery_price": 56,
+    "order_price": 300.0,
+    "status_id": 0,
+    "status": "pending",
+}
+```
+- La orden posee un delivery elegido, el cuál todavía no confirmó
+```json
+{
+    "order_id": 477,
+    "available": [
+       ...
+    ],
+    "closest": 9,
+    "chosen": 9,
+    "delivery_price": 56,
+    "order_price": 300.0,
+    "status_id": 1,
+    "status": "pending_delivery_acceptance",
+}
+```
+- La orden fue aceptada por el delivery. Se devuelve la ubicacion y datos del delivery
+```json
+{
+    "status": "accepted",
+    "status_id": 2,
+    "delivery_location": "-34.6122683,-58.3917467",
+    "delivery_data": {
+        "name": "Bart",
+        "surname": "Simpson",
+        "reputation": null,
+        "photo_url": "http://asd.com"
+    }
+}
+```
+- El delivery se encuentra en el local, esperando el pedido
+```json
+{
+    "status": "in_shop",
+    "status_id": 3,
+    "delivery_location": "-34.6122683,-58.3917467",
+    "delivery_data": {
+        "name": "Bart",
+        "surname": "Simpson",
+        "reputation": null,
+        "photo_url": "http://asd.com"
+    }
+}
+```
+
+- El delivery salió del local y va rumbo al domicilio
+```json
+{
+    "status": "out_shop",
+    "status_id": 4,
+    "delivery_location": "-34.6122683,-58.3917467",
+    "delivery_data": {
+        "name": "Bart",
+        "surname": "Simpson",
+        "reputation": null,
+        "photo_url": "http://asd.com"
+    }
+}
+```
+- El delivery marcó que ya entregó la orden
+```json
+{
+    "status": "delivered",
+    "status_id": 5,
+    "delivery_location": "-34.6122683,-58.3917467",
+    "delivery_data": {
+        "name": "Bart",
+        "surname": "Simpson",
+        "reputation": null,
+        "photo_url": "http://asd.com"
+    }
+}
+```
+- Se confirmó la recepcion de la orden
+```json
+{
+    "status": "confirmed",
+    "status_id": 6,
+    "delivery_location": "-34.6122683,-58.3917467",
+    "delivery_data": {
+        "name": "Bart",
+        "surname": "Simpson",
+        "reputation": null,
+        "photo_url": "http://asd.com"
+    }
+}
+```
+- La orden fue cancelada
+```json
+    "status": "cancelled",
+    "status_id": 9,
+```
+
+---
+
+ ### Cancelar Orden
+ La orden sólo se puede cancelar si todavía no se elegió delivery o el mismo todavía no confirmó el pedido. Una vez que el delivery acepta una orden, esta no se puede cancelar.
+
+ **URL**: `/api/orders/<order_id>/cancel`
+ **METHODS** POST
+ ```json
+    "user_id": # El id del usuario
+ ```
+
+ Si la orden se logró cancelar, el servidor devuelve
+
+ ```json
+    "status": "cancelled",
+    "status_id": 9
+ ```
+
+ caso contrario devuelve el estado actual de la orden.
+
+ ---
+
+ ### Confirmar Recepción Orden
+
+ **URL**: `/api/orders/confirm`
+ **METHODS**: POST
+ ```json
+    "user_id":,
+    "order_id":, 
+```
+
+---
+
+### Calificar Pedido
+
+Este endpoint le permite a ambas partes calificar a su contraparte
+
+**URL**: `/api/orders/review`
+**METHODS**: POST
+```json
+    "user_id": ,
+    "order_id": ,
+    "review": <float>
+```
+
+---
+
+### Ponerse como Disponible / Actualizar ubicacion
+
+Este endpoint sirve para que los usuarios se marquen como disponibles para realizar envios y/o actualizar su estado durante un envio.
+
+**URL**: `/api/deliveries/status`
+**METHODS**: GET, POST
+
+ - **GET**: Devuelve el status de todos los deliveries. Esto en realidad debería ser parte de `/api/admins`
+ ```json
+ [
+     {
+        "user_id": 6,
+        "location": "-34.5752085,-58.40428670000001",
+        "available": false,
+        "last_updated": "2019-12-01T14:36:08"
+    },...
+ ]
+ ```
+
+ - **POST**: Un usuario actualiza su estado
+```json
+{
+    "user_id": ,# El id del usuario
+    "location":, # Las coordenadas
+    "available": <boolean> # Si se encuentra apto para recibir un pedido (true) u ocupado (false).
+}
+```
+
+---
+
+### Obtener ordenes disponibles / actualizar estado
+
+Este endpoint sirve para quien va a realizar un delivery, vea que ordenes tiene disponibles para aceptar. Y una vez aceptada, actualizra el estado
+
+**URL**: `/api/orders/available/<user_id>`
+**METHODS**: GET, PUT
+
+ - **GET**: Obtiene todas las ordenes pendientes para aceptar. Figura la ubicacion del comercio, del usuario, la distancia entre ambos; la distancia entre el delivery (segun la ultima reportada) y el comercio, y la distancia total.
+ Asímismo figuran los datos publicos del usuario y cuál será la ganancia del delivery.
+ ```json
+ [
+     {
+        "id": 4,
+        "shop_id": 4,
+        "user_id": 1,
+        "user_location": "-34.572259,-58.4843497",
+        "shop_location": "-34.571691,-58.4441975",
+        "distance": 5151,
+        "favor": false,
+        "products": [
+            {
+                "id": 1,
+                "quantity": 1
+            }
+        ],
+        "address": null,
+        "distance_to_shop": 190920,
+        "total_distance": 196071,
+        "user_data": {
+            "name": "Elaine",
+            "surname": "Simoneaux",
+            "reputation": 5.0
+        },
+        "revenue": 55.25
+    },...
+ ]
+ ```
+
+ - **PUT**: Con esto aceptará y actualizará los estados de las ordenes
+    ```json
+        "order_id": # Id de la orden,
+        "status": 
+    ```
+    Donde el status puede ser `accepted`, `in_shop`, `out_shop` o `delivered`.
