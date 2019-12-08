@@ -183,6 +183,14 @@ Ejemplos:
 
 En este sentido decimos que en cierto modo la API está auto documentada, con levantar el servidor y hacer requests vacios, el mismo nos responderá que nos falta enviar.
 
+## Convenciones en la respuesta
+Se sigue la siguiente convención de códigos de estado
+
+- **200**: Obtencion o modificacion exitosa de un recurso.
+- **201**: Creacion de un objeto exitoso.
+- **400**: En caso de un request malformado, ya se por esquema o porque no cumple con los requerimientos del modelo.
+- **404**: Recurso no encontrado
+
 ## Admins
 Por defecto el sistema posee un usuario administrador, cuyo email es `admin@foodie.com` y contraseña `admin123`
 
@@ -208,14 +216,219 @@ Por defecto el sistema posee un usuario administrador, cuyo email es `admin@food
 
 **METHODS**: PUT
 
-**HEADERS**: Authorization
+**BODY**
+```json
+    "password": <string> # min 6 chars
+```
+
+**RESPONSE**
+ - 200: Cambio Correcto
+
+---
+
+### Nuevo Admin
+**URL**: `/api/admin/new_admin`
+
+**METHODS**: POST
 
 **BODY**
 ```json
-    "password": <string>
+    "name": <string>,
+    "surname": <string>,
+    "email": <email>,
+    "password": <string> # min 6 chars
 ```
+
 **RESPONSE**
- - 200: Cambio Correcto
+ - 201: Usuario creado correctamente
+
+---
+
+### Obtener y Editar Usuarios
+
+**URL**: `/api/admin/users/<user_id>`
+
+**METHODS**: GET, PUT, DELETE
+
+- **GET**: Si se especifica el `user_id` devuelve los datos de dicho usuario. Si se omite, se devuelve una lista con los datos de todos los usuarios. Ejemplo de los datos de un usuario:
+    ```json
+    {
+        "active": true,
+        "cash_balance": 0.0,
+        "creation_date": "2019-12-01T14:35:54",
+        "email": "hola@gmail.com",
+        "favor_balance": 0.0,
+        "id": 1,
+        "name": "Elaine",
+        "password": "insecure",
+        "phone": "4444-5555",
+        "photo_url": null,
+        "reputation": 5.0,
+        "role": "user",
+        "status": "active",
+        "subscription": "premium",
+        "surname": "Simoneaux"
+    }
+    ```
+    Respuestas:
+     - 200: Ok
+     - 404: `user_id` no existe
+- **PUT**: Permite modificar los datos de un usuario, es necesario especificar el `user_id`.
+    Todos los campos son editables, excepto `reputation`, `id` y `creation_date`
+
+    Asímismo se debe respetar las restricciones del modelo.
+    - Role: Si a un usuario se le cambia el rol al de delivery y el mismo no poseeia foto, el sistema no te deja cambiarle sólo el rol sin especificar una imagen.
+    - Role: Sólo se permite `user` o `delivery`
+    - Subscription: Sólo se permite `flat` o `premium`
+    - Email: No se permiten emails duplicados.
+
+- **DELETE**: Setea un usuario como `active=False`
+
+---
+
+### Crear, obtener y editar Comercios
+
+**URL**: `/api/admins/shops/<shop_id>`
+
+**METHODS**: POST, PUT, GET, DELETE
+
+- **GET**: Obtiene la informacion de los comercios. Si no se especifica el `shop_id` devuelve todos los shops.
+Ejemplo
+```json
+{
+    "id": 1,
+    "name": "Pizzeria los HDP",
+    "description": "La peor pizzeria de la ciudad",
+    "address": "Cabildo 505",
+    "location": "-34.571691,-58.4441975",
+    "category": "pizzeria",
+    "creation_date": "2019-12-01T14:35:58",
+    "active": true
+}
+```
+
+- **POST**: Crea un nuevo comercio
+```json
+{
+	"name": "Pizzeria los HDP",
+	"description": "La peor pizzeria de la ciudad",
+	"address": "Cabildo 500",
+	"location": "-34.571691,-58.4441975",
+	"category": "pizzeria"
+}
+```
+
+- **PUT**: Se modifica un comercio, admite los mismos campos que el **POST** + `active=True` para re-habilitar un comercio.
+- **DELETE**: Se setea `active=False` para un comercio.
+
+---
+
+### Crear, Obtener y Editar Productos
+
+**URL**: `/api/admin/products/`
+**METHODS**: POST, GET, PUT, DELETE
+
+ - **GET**: Devuelve todos los productos en la plataforma
+ ```json
+ [
+     {
+        "id": 1,
+        "shop_id": 1,
+        "name": "Pizza de Anana",
+        "description": "Salsa de Tomate, Mozzarella y rodajas de anana",
+        "category": "pizzas",
+        "price": 300.0,
+        "creation_date": "2019-12-01T14:36:01",
+        "active": true
+    }...
+ ]
+ ```
+ - **POST**: Crea un nuevo producto
+ ```json
+    {
+    'shop_id': <shop_id>,  # Debe existir
+    'name': 'Sanguche Milanesa',
+    'description': 'Sanguche de Milanesa',
+    'category': 'sanguche',
+    'price': 200,
+    }
+ ```
+
+ - **PUT**: Se edita un producto, se admiten los siguientes campos
+ ```json
+    "id": <id del producto a editar> # Obligatorio,
+    "shop_id": <el id de otro shop>,
+    "name": <string>,
+    "description": <string>,
+    "category": <string>,
+    "price": <float>,
+    "active": <boolean>
+ ```
+ - **DELETE**: Se setea `active=False` para dicho producto
+
+---
+
+### Ver Órdenes existentes
+
+**URL**: `/api/admin/orders`
+**METHODS**: GET
+
+Obtiene la informacion de todas las órdenes en el sistema. Ejemplo:
+
+```json
+[
+    {
+        "id": 3,
+        "shop_id": 2,
+        "user_id": 7,
+        "delivery_id": null,
+        "user_location": "-34.572259,-58.4843497",
+        "shop_location": "-34.5627322,-58.4564323",
+        "distance": 4130,
+        "status": "pending",
+        "status_id": 0,
+        "favor": false,
+        "products": [
+            {
+                "id": 3,
+                "quantity": 1
+            }
+        ],
+        "price": 230.0,
+        "product_prices": 2.99,
+        "creation_date": "2019-12-08T04:13:56",
+        "order_metadata": {
+            "creation_date": "2019-12-08T04:13:56"
+        },
+        "delivery_revenue": null,
+        "address": "Paseo Colón 850"
+    },...
+]
+```
+
+---
+
+### Ver y Editar reglas de precios
+
+**URL**: `/api/admin/pricing
+**METHODS**: GET, PUT
+
+ - **GET**: Obtiene las reglas actuales de precios
+ ```json
+ {
+    "flat_min_km": 2,
+    "flat_base": 200,
+    "flat_extra_km": 15,
+    "premium_min_km": 3,
+    "premium_base": 20,
+    "premium_extra_km": 12,
+    "delivery_revenue_perc": 85
+}
+```
+
+- **PUT**: Se editan las reglas. No se puede omitir ningun campo, se debe enviar todo el JSON.
+
+---
 
 ### Usuarios
 
