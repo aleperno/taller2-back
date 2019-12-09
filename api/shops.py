@@ -264,6 +264,8 @@ class OrderMessage(Resource):
             'message': message,
         }
 
-        resp = send_message_to(destiny_token, "Nuevo Mensaje", message, data=data)
+        to_delivery = (other_user_id == order.delivery_id)
+
+        resp = send_message_to(destiny_token, "Nuevo Mensaje", message, data=data, to_delivery=to_delivery)
 
         return resp, 200

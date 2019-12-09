@@ -20,17 +20,20 @@ headers = {
 }
 
 
-def send_message_to(token, title, mensaje, data):
+def send_message_to(token, title, mensaje, data, to_delivery=False):
 
     post_data = {
         "to": token,
         "notification": {
+            "android": {"priority": "high"},
             "title": title,
             "body": mensaje,
+            "click_action": "open_client_chat"
         },
         "data": data
     }
 
+    post_data['notification']['click_action'] = 'open_delivery_chat' if to_delivery else 'open_client_chat'
     response = requests.post('https://fcm.googleapis.com/fcm/send', headers=headers, data=json.dumps(post_data))
 
     if response.status_code == 200:
