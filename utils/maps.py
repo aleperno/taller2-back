@@ -21,8 +21,8 @@ def _extract_row_data(row):
 
     for d in row['elements']:
         for k,v in d.items():
-            if k == 'status' and v == 'OK':
-                data['status'] = True
+            if k == 'status':
+                data['status'] = (v == 'OK')
             else:
                 data[k] = v['value']
     return data
