@@ -43,6 +43,21 @@ class AdminLogin(UserLogin):
     token_cls = AdminAuthToken
     user_cls = FoodieAdmin
 
+    @validates_post_schema(LoginSchema)
+    def post(self, post_data):
+        user_data = post_data
+        email = user_data['email']
+        password = user_data['password']
+
+        user = self.user_cls.get_by_email(email)
+
+        if not user:
+            return 'User not found', 404
+        elif not user.valid_password(password):
+            return 'Wrong Password', 401
+        token = self.token_cls.get_user_token(user.id)._as_dict()
+        return token, 200, {'Authorization': token['token']}
+
 
 class FacebookLogin(Resource):
     @validates_post_schema(FacebookLoginSchema)
