@@ -131,7 +131,15 @@ class BaseAuthToken(Base):
     def get_user_token(cls, _id):
         current = cls.query().get(_id)
         if not current:
-            return cls.generate_new_token(_id)
+            try:
+                return cls.generate_new_token(_id)
+            except:
+                # Intento por si hubo problema de concurrencia
+                aux = cls.query().get(_id)
+                if aux:
+                    return aux
+                else:
+                    raise
         else:
             return current
 
@@ -273,9 +281,20 @@ class FirebaseToken(Base):
 
     @classmethod
     def set_token(cls, user_id, token):
+        """
+        Hay problemas de concurrencia, así que se hace idempotente
+        """
         token_obj = cls.get_by_id(user_id)
         if not token_obj:
-            token_obj = cls(user_id=user_id, token=token)
+            try:
+                token_obj = cls(user_id=user_id, token=token)
+            except:
+                aux = cls.get_by_id(user_id)
+                if aux:
+                    aux.token = token
+                    aux.save_to_db()
+                else:
+                    raise
         else:
             token_obj.token = token
         token_obj.save_to_db()
