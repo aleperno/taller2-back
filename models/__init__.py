@@ -17,8 +17,12 @@ Session = scoped_session(sessionmaker(bind=engine))
 class CommonBase(object):
 
     def save_to_db(self):
-        Session.add(self)
-        Session.commit()
+        try:
+            Session.add(self)
+            Session.commit()
+        except:
+            Session.rollback()
+            raise
 
     @classmethod
     def query(cls):
